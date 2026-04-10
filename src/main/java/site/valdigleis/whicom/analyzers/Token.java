@@ -26,13 +26,21 @@ package site.valdigleis.whicom.analyzers;
 
 public class Token {
     
-    public enum Type { ID, NUMBER, ASSIGN, PLUS, MINUS, PRODUCT, LA, LESS, EQUAL, PUNCTUATION, IF, THEN, ELSE, SKIP, TRUE, FALSE, NOT, AND, OR, EOF }
-    public final Type type;
-    public final String lexeme;
+    public enum Type { ID, NUMBER, ASSIGN, PLUS, MINUS, PRODUCT, LA, LESS, EQUAL, PUNCTUATION, IF, THEN, ELSE, SKIP, TRUE, FALSE, NOT, AND, OR, LEFTP, RIGHTP, EOF }
+    private final Type type;
+    private final String lexeme;
 
     public Token(String lexeme, Type type) {
         this.type = type;
         this.lexeme = lexeme;
+    }
+
+    public String getLexeme() {
+        return lexeme;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     @Override

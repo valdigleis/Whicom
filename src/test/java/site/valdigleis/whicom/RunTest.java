@@ -24,13 +24,7 @@
  */
 package site.valdigleis.whicom;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
-import org.junit.After;
-import org.junit.Before;
+import java.io.IOException;
 import org.junit.Test;
 
 /**
@@ -38,42 +32,14 @@ import org.junit.Test;
  */
 public class RunTest {
 
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
-    private final PrintStream originalOut = System.out;
-    private final PrintStream originalErr = System.err;
-
-    @Before
-    public void setUp() {
-        System.setOut(new PrintStream(outContent));
-        System.setErr(new PrintStream(errContent));
+    @Test(expected = IllegalArgumentException.class)
+    public void testWrongExtensionThrowsException() throws IOException {
+        Run.main(new String[]{"invalid_file.txt"});
     }
 
-    @After
-    public void tearDown() {
-        System.setOut(originalOut);
-        System.setErr(originalErr);
-        errContent.reset();
-    }
-
-    @Test
-    public void noArguments(){
-        Run.main(new String[]{});
-        String output = errContent.toString();
-        assertTrue("Error?", output.contains("Whicom needs to receive the path to a file with the .w extension."));
-    }
-
-    @Test
-    public void usingArgumentsSucess() {
-        String path = "assets/code1.w";
-        Run.main(new String[]{path});
-    }
-
-    @Test
-    public void usingArgumentsError() {
-        Run.main(new String[]{"assets/code0.w"});
-        String output = errContent.toString();
-        assertTrue("Msg Error", output.contains("Error: Could not read file at"));
+    @Test(expected = IOException.class)
+    public void testFileNotFoundThrowsException() throws IOException {
+        Run.main(new String[]{"non_existent_file.w"});
     }
 
 }

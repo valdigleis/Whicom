@@ -46,41 +46,36 @@ public class Parser {
      * @param type
      */
     private void consume(Token.Type type) {
-        if (this.peek().type == type) {
+        if (this.peek().getType() == type) {
             this.lookahead++;
         } else {
-            throw new RuntimeException("Error: Expected " + type + " but it came " + peek().type);
+            throw new RuntimeException("Error: Expected " + type + " but it came " + peek().getType());
         }
     }
 
     public void parse() {
-        while (this.peek().type != Token.Type.EOF) {
+        while (this.peek().getType() != Token.Type.EOF) {
             this.commands();
         }
     }
 
     private void commands() {
-        switch (this.peek().type) {
-            case ID: 
-                this.consume(Token.Type.ID);
-                this.consume(Token.Type.ASSIGN);
-                this.arithmeticsExp();
-                break;
-            case SKIP: 
-                this.consume(Token.Type.SKIP); 
-                break;
-            case IF: 
-                this.consume(Token.Type.IF);
-                this.booleanExp();
-                this.consume(Token.Type.THEN);
-                this.commands();
-                this.consume(Token.Type.ELSE);
-                this.commands();
-                break;
-        }
-        if (this.peek().type == Token.Type.PUNCTUATION) {
+        if(this.peek().getType() == Token.Type.ID){
+            this.consume(Token.Type.ID);
+            this.consume(Token.Type.ASSIGN);
+            this.arithmeticsExp();
+        } else if (this.peek().getType() == Token.Type.SKIP){
+            this.consume(Token.Type.SKIP); 
+        } else if (this.peek().getType() == Token.Type.IF) {
+            this.consume(Token.Type.IF);
+            this.booleanExp();
+            this.consume(Token.Type.THEN);
+            this.commands();
+            this.consume(Token.Type.ELSE);
+            this.commands();
+        } else if (this.peek().getType() == Token.Type.PUNCTUATION) {
             this.consume(Token.Type.PUNCTUATION);
-            if (this.peek().type != Token.Type.EOF && peek().type != Token.Type.ELSE) {
+            if (this.peek().getType() != Token.Type.EOF && peek().getType() != Token.Type.ELSE) {
                 this.commands();
             }
         }
@@ -88,24 +83,24 @@ public class Parser {
 
     private void arithmeticsExp() {
         this.term();
-        while (this.peek().type == Token.Type.PLUS || this.peek().type == Token.Type.MINUS) {
-            this.consume(peek().type);
+        while (this.peek().getType() == Token.Type.PLUS || this.peek().getType() == Token.Type.MINUS) {
+            this.consume(peek().getType());
             this.term();
         }
     }
 
     private void term() {
         this.factor();
-        while (this.peek().type == Token.Type.PRODUCT) {
+        while (this.peek().getType() == Token.Type.PRODUCT) {
             this.consume(Token.Type.PRODUCT);
             this.factor();
         }
     }
 
     private void factor() {
-        if (this.peek().type == Token.Type.ID) { 
+        if (this.peek().getType() == Token.Type.ID) { 
             this.consume(Token.Type.ID);
-        } else if (peek().type == Token.Type.NUMBER) {
+        } else if (peek().getType() == Token.Type.NUMBER) {
             this.consume(Token.Type.NUMBER);
         } else {
             throw new RuntimeException("Invalid factor");
@@ -113,29 +108,29 @@ public class Parser {
     }
 
     private void booleanExp() {
-        if (this.peek().type == Token.Type.TRUE) { 
+        if (this.peek().getType() == Token.Type.TRUE) { 
             this.consume(Token.Type.TRUE);
-        } else if (this.peek().type == Token.Type.FALSE) { 
+        } else if (this.peek().getType() == Token.Type.FALSE) { 
             this.consume(Token.Type.FALSE);
-        } else if (this.peek().type == Token.Type.NOT) { 
+        } else if (this.peek().getType() == Token.Type.NOT) { 
             this.consume(Token.Type.NOT);
             this.booleanExp();
         } else {
             this.arithmeticsExp();
-            if (peek().type == Token.Type.EQUAL) {
+            if (peek().getType() == Token.Type.EQUAL) {
                 this.consume(Token.Type.EQUAL);
                 this.arithmeticsExp();
-            } else if (peek().type == Token.Type.LESS) {
+            } else if (peek().getType() == Token.Type.LESS) {
                 this.consume(Token.Type.LESS);
                 this.arithmeticsExp();
-            } else if (peek().type == Token.Type.LESS) {
+            } else if (peek().getType() == Token.Type.LESS) {
                 this.consume(Token.Type.LA);
                 this.arithmeticsExp();
             }
         }
 
-        if (this.peek().type == Token.Type.AND || this.peek().type == Token.Type.OR) {
-            this.consume(peek().type);
+        if (this.peek().getType() == Token.Type.AND || this.peek().getType() == Token.Type.OR) {
+            this.consume(peek().getType());
             this.booleanExp();
         }
     }

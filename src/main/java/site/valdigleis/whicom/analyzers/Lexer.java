@@ -86,9 +86,6 @@ public class Lexer {
             } else if (current == '<') {
                 tokens.add(new Token("<", Token.Type.LESS));
                 this.ref++;
-            } else if (current == '>') {
-                tokens.add(new Token(">", Token.Type.LA));
-                this.ref++;
             } else if (current == '+') {
                 tokens.add(new Token("+", Token.Type.PLUS));
                 this.ref++;
@@ -103,6 +100,12 @@ public class Lexer {
                 this.ref++;
             } else if (current == '!') {
                 tokens.add(new Token("!", Token.Type.NOT));
+                this.ref++;
+            } else if (current == '(') {
+                tokens.add(new Token("(", Token.Type.LEFTP));
+                this.ref++;
+            } else if (current == ')') {
+                tokens.add(new Token(")", Token.Type.RIGHTP));
                 this.ref++;
             } else {
                 throw new RuntimeException("Unexpected character: " + current);

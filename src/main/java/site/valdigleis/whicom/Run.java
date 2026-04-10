@@ -38,19 +38,23 @@ import site.valdigleis.whicom.utils.Preprocessor;
  *
  */
 public class Run {
-    public static void main( String[] args ) {
+    public static void main( String[] args ) throws IOException, IllegalArgumentException {
+        
         if(args.length < 1) {
-            System.err.println("Whicom needs to receive the path to a file with the .w extension.");
-            return;
+            throw new IllegalArgumentException("Whicom needs to receive the path to a file with the .w extension.");
         }
+        
         String filePath = args[0];
-        try {
-            String text = new String(Files.readAllBytes(Paths.get(filePath)));
-            String code =  Preprocessor.removeComments(text);
-            Lexer lexer = new Lexer(code);
-            List<Token> tokens = lexer.tokenize();
-        } catch (IOException e) {
-           System.err.println("Error: Could not read file at " + filePath); 
+        if (!filePath.endsWith(".w")) {
+            throw new IllegalArgumentException("Invalid file extension. Expected the extesion .w");
         }
+
+        byte[] bytes = Files.readAllBytes(Paths.get(filePath));
+        String text = new String(bytes);
+        String code = Preprocessor.removeComments(text);
+        Lexer lexer = new Lexer(code);
+        List<Token> tokens = lexer.tokenize();
+
+        System.out.println("Hello, world!");
     }
 }
