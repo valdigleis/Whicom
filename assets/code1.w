@@ -9,15 +9,17 @@ mult : y * z;
 D : 4 -5 
 
 /* Realizando um teste condicional */
-if soma > mult then
+if (soma > mult) then {
     alvo : 1
-else
+} else {
     alvo : 0
+}
 
-if soma < mult then
+if (soma < mult) then {
     alvo : 1
-else
+} else {
     alvo : 0
+}
 
-if soma = mult then
-        alvo:1 else skip;
+if (soma = mult) then {
+        alvo:1 }{ else skip; }

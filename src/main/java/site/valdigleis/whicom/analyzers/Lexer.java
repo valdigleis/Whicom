@@ -107,6 +107,12 @@ public class Lexer {
             } else if (current == ')') {
                 tokens.add(new Token(")", Token.Type.RIGHTP));
                 this.ref++;
+            } else if (current == '{') {
+                tokens.add(new Token("{", Token.Type.LEFTK));
+                this.ref++;
+            } else if (current == '}') {
+                tokens.add(new Token("}", Token.Type.RIGHTK));
+                this.ref++;
             } else {
                 throw new RuntimeException("Unexpected character: " + current);
             }

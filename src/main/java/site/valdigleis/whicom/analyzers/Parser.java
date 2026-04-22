@@ -60,6 +60,10 @@ public class Parser {
     }
 
     private void commands() {
+        // Trata os três tipos de comandos
+        // 1 - x: E
+        // 2 - SKIP
+        // 3 - if (B) { cmd } else { cmd }
         if(this.peek().getType() == Token.Type.ID){
             this.consume(Token.Type.ID);
             this.consume(Token.Type.ASSIGN);
@@ -68,12 +72,20 @@ public class Parser {
             this.consume(Token.Type.SKIP); 
         } else if (this.peek().getType() == Token.Type.IF) {
             this.consume(Token.Type.IF);
+            this.consume(Token.Type.LEFTP);
             this.booleanExp();
+            this.consume(Token.Type.RIGHTP);
             this.consume(Token.Type.THEN);
+            this.consume(Token.Type.LEFTK);
             this.commands();
+            this.consume(Token.Type.RIGHTK);
             this.consume(Token.Type.ELSE);
+            this.consume(Token.Type.LEFTK);
             this.commands();
-        } else if (this.peek().getType() == Token.Type.PUNCTUATION) {
+            this.consume(Token.Type.RIGHTK);
+        } 
+        // Trata as sequências de comandos
+        if (this.peek().getType() == Token.Type.PUNCTUATION) {
             this.consume(Token.Type.PUNCTUATION);
             if (this.peek().getType() != Token.Type.EOF && peek().getType() != Token.Type.ELSE) {
                 this.commands();
@@ -82,56 +94,42 @@ public class Parser {
     }
 
     private void arithmeticsExp() {
+        // E -> TE'
         this.term();
-        while (this.peek().getType() == Token.Type.PLUS || this.peek().getType() == Token.Type.MINUS) {
-            this.consume(peek().getType());
+        this.expLine();
+    }
+
+    private void expLine() {
+        // E' -> +TE' | \lambda
+        if(this.peek().getType() == Token.Type.PLUS) {
+            this.consume(Token.Type.PLUS);
             this.term();
+            this.expLine();
         }
     }
 
     private void term() {
+        // T -> GT'
         this.factor();
-        while (this.peek().getType() == Token.Type.PRODUCT) {
+        this.termLine();
+    }
+
+    private void termLine() {
+        // T' -> *GT' | \lambda
+        if(this.peek().getType() == Token.Type.PRODUCT) {
             this.consume(Token.Type.PRODUCT);
             this.factor();
+            this.expLine();
         }
     }
 
     private void factor() {
-        if (this.peek().getType() == Token.Type.ID) { 
+        if(this.peek().getType() == Token.Type.ID) {
             this.consume(Token.Type.ID);
-        } else if (peek().getType() == Token.Type.NUMBER) {
+        } else if(this.peek().getType() == Token.Type.NUMBER) {
             this.consume(Token.Type.NUMBER);
         } else {
-            throw new RuntimeException("Invalid factor");
-        }
-    }
-
-    private void booleanExp() {
-        if (this.peek().getType() == Token.Type.TRUE) { 
-            this.consume(Token.Type.TRUE);
-        } else if (this.peek().getType() == Token.Type.FALSE) { 
-            this.consume(Token.Type.FALSE);
-        } else if (this.peek().getType() == Token.Type.NOT) { 
-            this.consume(Token.Type.NOT);
-            this.booleanExp();
-        } else {
-            this.arithmeticsExp();
-            if (peek().getType() == Token.Type.EQUAL) {
-                this.consume(Token.Type.EQUAL);
-                this.arithmeticsExp();
-            } else if (peek().getType() == Token.Type.LESS) {
-                this.consume(Token.Type.LESS);
-                this.arithmeticsExp();
-            } else if (peek().getType() == Token.Type.LESS) {
-                this.consume(Token.Type.LA);
-                this.arithmeticsExp();
-            }
-        }
-
-        if (this.peek().getType() == Token.Type.AND || this.peek().getType() == Token.Type.OR) {
-            this.consume(peek().getType());
-            this.booleanExp();
+            throw new RuntimeException(this.peek().getType() + "Not is valid factor!");
         }
     }
 
