@@ -44,6 +44,7 @@ public class Lexer {
         }
         String text = sb.toString();
         switch (text) {
+            case "while" : return new Token(text, Token.Type.WHILE);
             case "if":   return new Token(text, Token.Type.IF);
             case "then": return new Token(text, Token.Type.THEN);
             case "else": return new Token(text, Token.Type.ELSE);

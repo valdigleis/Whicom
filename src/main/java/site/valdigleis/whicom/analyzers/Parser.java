@@ -43,7 +43,9 @@ public class Parser {
      * 
      * Consume tokens
      * 
-     * @param type
+     * @param type O tipo de token para ser consumido
+     * 
+     * @throws RuntimeException Lançada quando o token apontato pelo lookahead não é do mesmo tipo do token que deve ser consumido
      */
     private void consume(Token.Type type) {
         if (this.peek().getType() == type) {
@@ -53,17 +55,21 @@ public class Parser {
         }
     }
 
+    /**
+     * Método que "starta" o processo de análise sintática
+     */
     public void parse() {
         while (this.peek().getType() != Token.Type.EOF) {
             this.commands();
         }
     }
 
+    /**
+     * Método que realiza a análise dos comandos (C) da linguagem WHILE, ou seja, este é a tradução diretas da regras:<br>
+     * 
+     * C &Rightarrow; id:E; | id:E;C | skip; | skip;C | if (B) { C } else { C } | if (B) { C } else { C } C |  While (B) { cmd } |  While (B) { cmd } C
+     */
     private void commands() {
-        // Trata os três tipos de comandos
-        // 1 - x: E
-        // 2 - SKIP
-        // 3 - if (B) { cmd } else { cmd }
         if(this.peek().getType() == Token.Type.ID){
             this.consume(Token.Type.ID);
             this.consume(Token.Type.ASSIGN);
@@ -83,7 +89,15 @@ public class Parser {
             this.consume(Token.Type.LEFTK);
             this.commands();
             this.consume(Token.Type.RIGHTK);
-        } 
+        } else if (this.peek().getType() == Token.Type.WHILE) {
+            this.consume(Token.Type.WHILE);
+            this.consume(Token.Type.LEFTP);
+            this.booleanExp();
+            this.consume(Token.Type.RIGHTP);
+            this.consume(Token.Type.LEFTK);
+            this.commands();
+            this.consume(Token.Type.RIGHTK);
+        }
         // Trata as sequências de comandos
         if (this.peek().getType() == Token.Type.PUNCTUATION) {
             this.consume(Token.Type.PUNCTUATION);
@@ -93,14 +107,21 @@ public class Parser {
         }
     }
 
+    /**
+     * Método que realiza a análise das expressões aritméticas (E), ou seja, este é a tradução direta da regra:<br>
+     * 
+     * E &Rightarrow; TE'
+     */
     private void arithmeticsExp() {
-        // E -> TE'
         this.term();
         this.expLine();
     }
 
+    /**
+     * Método que realiza a análise dos sutermos aditivos (E') aninhados a uma expressão aritmética, ou seja, este método é a tradução direta das regras gramaticais:<br> 
+     * E' &Rightarrow; +TE' | &lambda;
+     */
     private void expLine() {
-        // E' -> +TE' | \lambda
         if(this.peek().getType() == Token.Type.PLUS) {
             this.consume(Token.Type.PLUS);
             this.term();
@@ -108,14 +129,20 @@ public class Parser {
         }
     }
 
+    /**
+     * Método que realiza a análise subtermo (T), ou seja, este método é a tradução direta da regra gramatical:<br> 
+     * T &Rightarrow; GT'
+     */
     private void term() {
-        // T -> GT'
         this.factor();
         this.termLine();
     }
 
+    /**
+     * Método que realiza a análise dos sutermos multiplicativos aninhados a um termo T', ou seja, este método é a tradução direta das regras gramaticais:<br> 
+     * T' &Rightarrow; *GT' | &lambda;
+     */
     private void termLine() {
-        // T' -> *GT' | \lambda
         if(this.peek().getType() == Token.Type.PRODUCT) {
             this.consume(Token.Type.PRODUCT);
             this.factor();
@@ -123,6 +150,11 @@ public class Parser {
         }
     }
 
+    /** 
+     * Método que consome um fator de uma expressão aritmética, quando o fator for válido (ou seja, quando o fator é um ID ou um valor numérico).
+     * 
+     * @throws RuntimeException Lançada quando o fator não é válido!
+     * */
     private void factor() {
         if(this.peek().getType() == Token.Type.ID) {
             this.consume(Token.Type.ID);

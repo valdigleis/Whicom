@@ -26,7 +26,7 @@ package site.valdigleis.whicom.analyzers;
 
 public class Token {
     
-    public enum Type { ID, NUMBER, ASSIGN, PLUS, MINUS, PRODUCT, LA, LESS, EQUAL, PUNCTUATION, IF, THEN, ELSE, SKIP, TRUE, FALSE, NOT, AND, OR, LEFTP, RIGHTP, LEFTK, RIGHTK, EOF }
+    public enum Type { ID, NUMBER, ASSIGN, PLUS, MINUS, PRODUCT, LA, LESS, EQUAL, PUNCTUATION, IF, THEN, ELSE, WHILE, SKIP, TRUE, FALSE, NOT, AND, OR, LEFTP, RIGHTP, LEFTK, RIGHTK, EOF }
     private final Type type;
     private final String lexeme;
 
