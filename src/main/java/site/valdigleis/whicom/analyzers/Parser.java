@@ -31,10 +31,12 @@ public class Parser {
     private final List<Token> tokens;
     private int lookahead = 0;
 
+    
     public Parser(List<Token> tokens) { 
         this.tokens = tokens; 
     }
 
+    
     private Token peek() { 
         return tokens.get(this.lookahead); 
     }
@@ -162,6 +164,71 @@ public class Parser {
             this.consume(Token.Type.NUMBER);
         } else {
             throw new RuntimeException(this.peek().getType() + "Not is valid factor!");
+        }
+    }
+
+    private void booleanExp(){
+        this.termBoolean();
+        this.termOrBoolean();
+    }
+
+    private void termBoolean(){
+        this.booleanFactor();
+        this.termAndBoolean();
+    }
+
+    private void termAndBoolean(){
+        if(this.peek().getType() == Token.Type.AND){
+            this.consume(Token.Type.AND);
+            this.booleanFactor();
+            this.termAndBoolean();
+        }
+    }
+
+    private void termOrBoolean(){
+        if(this.peek().getType() == Token.Type.OR){
+            this.consume(Token.Type.OR);
+            this.termBoolean();
+            this.termOrBoolean();
+        }
+    }
+
+    private void booleanFactor(){
+        if(this.peek().getType() == Token.Type.NOT){
+            this.consume(Token.Type.NOT);
+            this.booleanFactor();
+        } else if (this.peek().getType() == Token.Type.LEFTP){
+            this.consume(Token.Type.LEFTP);
+            this.booleanExp();
+            this.consume(Token.Type.RIGHTP);
+        } else if (this.peek().getType() == Token.Type.TRUE){
+            this.consume(Token.Type.TRUE);
+        } else if (this.peek().getType() == Token.Type.FALSE){
+            this.consume(Token.Type.FALSE);
+        } else if (this.peek().getType() == Token.Type.ID){
+            this.consume(Token.Type.ID);
+            this.relations();
+        } else if (this.peek().getType() == Token.Type.NUMBER){
+            this.consume(Token.Type.NUMBER);
+            this.relations();
+        }
+    }
+
+    private void relations() {
+        if (this.peek().getType() == Token.Type.LESS) {
+            this.consume(Token.Type.LESS);
+            this.relationFactor();
+        } else if (this.peek().getType() == Token.Type.EQUAL) {
+            this.consume(Token.Type.EQUAL);
+            this.relationFactor();
+        }
+    }
+
+    private void relationFactor(){
+        if (this.peek().getType() == Token.Type.ID){
+            this.consume(Token.Type.ID);
+        } else if (this.peek().getType() == Token.Type.NUMBER){
+            this.consume(Token.Type.NUMBER);
         }
     }
 
