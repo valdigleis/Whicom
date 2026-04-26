@@ -1,0 +1,63 @@
+package site.valdigleis.whicom.analyzers;
+
+import java.util.ArrayList;
+
+import org.junit.Test;
+
+public class ParserTest {
+    
+    @Test
+    public void testSimpleAssignment() {
+        ArrayList<Token> tokens = new Lexer("x : 10;").tokenize();
+        Parser parser = new Parser(tokens);
+        parser.parse();
+    }
+
+    @Test
+    public void testSimpleSkip() {
+        ArrayList<Token> tokens = new Lexer("skip;").tokenize();
+        Parser parser = new Parser(tokens);
+        parser.parse();
+    }
+
+    @Test
+    public void testSequenceAssignments() {
+        ArrayList<Token> tokens = new Lexer("x : 10;y:10; z: 25;").tokenize();
+        Parser parser = new Parser(tokens);
+        parser.parse();
+    }
+
+    @Test
+    public void testSequenceSkips() {
+        ArrayList<Token> tokens = new Lexer("skip; skip; skip ;").tokenize();
+        Parser parser = new Parser(tokens);
+        parser.parse();
+    }
+
+    @Test
+    public void testSimpleSequence() {
+        ArrayList<Token> tokens = new Lexer("skip; x : 12; skip ; z : 5 + 7;").tokenize();
+        Parser parser = new Parser(tokens);
+        parser.parse();
+    }
+
+    @Test
+    public void testSimpleIf() {
+        ArrayList<Token> tokens = new Lexer("if ((true = false) and !10 = 1) then { skip; } else { y: 10; }").tokenize();
+        Parser parser = new Parser(tokens);
+        parser.parse();
+    }
+
+    @Test
+    public void testSimpleWhile() {
+        ArrayList<Token> tokens = new Lexer("while (true = false and !10 = z) { skip; }").tokenize();
+        Parser parser = new Parser(tokens);
+        parser.parse();
+    }
+
+    public void testSimpleProgram() {
+        ArrayList<Token> tokens = new Lexer("x: 0; y : 49; z: x; while (x < y) { z: z + 1; x: z * z;} if (!(true)) then {skip;} else {skip;}").tokenize();
+        Parser parser = new Parser(tokens);
+        parser.parse();
+    }
+}

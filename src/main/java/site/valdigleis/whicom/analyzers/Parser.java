@@ -69,15 +69,17 @@ public class Parser {
     /**
      * Método que realiza a análise dos comandos (C) da linguagem WHILE, ou seja, este é a tradução diretas da regras:<br>
      * 
-     * C &Rightarrow; id:E; | id:E;C | skip; | skip;C | if (B) { C } else { C } | if (B) { C } else { C } C |  While (B) { cmd } |  While (B) { cmd } C
+     * C &Rightarrow; id:E;C | skip;C | if (B) { C } else { C } | if (B) { C } else { C } C |  While (B) { cmd } |  While (B) { cmd } C | &lambda;
      */
     private void commands() {
         if(this.peek().getType() == Token.Type.ID){
             this.consume(Token.Type.ID);
             this.consume(Token.Type.ASSIGN);
             this.arithmeticsExp();
+            this.consume(Token.Type.PUNCTUATION);
         } else if (this.peek().getType() == Token.Type.SKIP){
-            this.consume(Token.Type.SKIP); 
+            this.consume(Token.Type.SKIP);
+            this.consume(Token.Type.PUNCTUATION);
         } else if (this.peek().getType() == Token.Type.IF) {
             this.consume(Token.Type.IF);
             this.consume(Token.Type.LEFTP);
@@ -99,13 +101,13 @@ public class Parser {
             this.consume(Token.Type.LEFTK);
             this.commands();
             this.consume(Token.Type.RIGHTK);
+        } else {
+            throw new RuntimeException("Commands cannot start with the tokien " + this.peek().toString());
         }
         // Trata as sequências de comandos
-        if (this.peek().getType() == Token.Type.PUNCTUATION) {
-            this.consume(Token.Type.PUNCTUATION);
-            if (this.peek().getType() != Token.Type.EOF && peek().getType() != Token.Type.ELSE) {
-                this.commands();
-            }
+        Token.Type next = this.peek().getType();
+        if (next == Token.Type.ID || next == Token.Type.SKIP || next == Token.Type.IF || next == Token.Type.WHILE) {
+            this.commands();
         }
     }
 
@@ -201,17 +203,21 @@ public class Parser {
             this.consume(Token.Type.LEFTP);
             this.booleanExp();
             this.consume(Token.Type.RIGHTP);
-        } else if (this.peek().getType() == Token.Type.TRUE){
-            this.consume(Token.Type.TRUE);
-        } else if (this.peek().getType() == Token.Type.FALSE){
-            this.consume(Token.Type.FALSE);
-        } else if (this.peek().getType() == Token.Type.ID){
-            this.consume(Token.Type.ID);
-            this.relations();
-        } else if (this.peek().getType() == Token.Type.NUMBER){
-            this.consume(Token.Type.NUMBER);
+        } else {
+            if (this.peek().getType() == Token.Type.TRUE){
+                this.consume(Token.Type.TRUE);
+            } else if (this.peek().getType() == Token.Type.FALSE) {
+                this.consume(Token.Type.FALSE);
+            } else if (this.peek().getType() == Token.Type.ID){
+                this.consume(Token.Type.ID);
+            } else if (this.peek().getType() == Token.Type.NUMBER){
+                this.consume(Token.Type.NUMBER);
+            } else {
+                throw new RuntimeException("Unexpected token in boolean expression: " + peek().getType());
+            }
             this.relations();
         }
+         
     }
 
     private void relations() {
@@ -225,12 +231,13 @@ public class Parser {
     }
 
     private void relationFactor(){
-        if (this.peek().getType() == Token.Type.ID){
-            this.consume(Token.Type.ID);
-        } else if (this.peek().getType() == Token.Type.NUMBER){
-            this.consume(Token.Type.NUMBER);
+        Token.Type type = this.peek().getType();
+        if (type == Token.Type.ID || type == Token.Type.NUMBER || 
+            type == Token.Type.TRUE || type == Token.Type.FALSE) {
+            this.consume(type);
+        } else {
+            throw new RuntimeException("Expected value after relational operator, but found " + type);
         }
     }
-
 
 }
