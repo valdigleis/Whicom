@@ -36,7 +36,7 @@ linguagem  essa muito popular no estudo de especificações formais e corretude 
 
 <div align="center">
 
-\<id\>  &Rightarrow; a | b | c | . . .  x | y | z |  a|\<id\> | b|\<id\> | c|\<id\> | . . .  x|\<id\> | y|\<id\> | z|\<id\>
+\<id\>  &Rightarrow; a | b | c | . . .  x | y | z |  a\<id\> | b\<id\> | c\<id\> | . . .  | x\<id\> | y\<id\> | z\<id\>
 
 \<num\> &Rightarrow; 0 | . . . | 9 | 0\<num\> | . . . | 9\<num\>
 
