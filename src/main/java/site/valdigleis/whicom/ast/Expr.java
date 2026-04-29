@@ -24,6 +24,4 @@
  */
 package site.valdigleis.whicom.ast;
 
-import site.valdigleis.whicom.analyzers.Token;
-
 public abstract class Expr extends ASTNode {}

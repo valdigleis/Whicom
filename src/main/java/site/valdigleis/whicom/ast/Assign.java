@@ -43,4 +43,9 @@ public class Assign extends Cmd {
     public Expr getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "Assign(" + this.variable.getLexeme() + ", " + this.toString() + ")";
+    }
 }

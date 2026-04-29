@@ -24,7 +24,20 @@
  */
 package site.valdigleis.whicom.analyzers;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import site.valdigleis.whicom.ast.Assign;
+import site.valdigleis.whicom.ast.Binary;
+import site.valdigleis.whicom.ast.Block;
+import site.valdigleis.whicom.ast.Cmd;
+import site.valdigleis.whicom.ast.Conditional;
+import site.valdigleis.whicom.ast.Expr;
+import site.valdigleis.whicom.ast.Literal;
+import site.valdigleis.whicom.ast.Loop;
+import site.valdigleis.whicom.ast.Skip;
+import site.valdigleis.whicom.ast.Unary;
+import site.valdigleis.whicom.ast.Variable;
 
 public class Parser {
 
@@ -61,6 +74,12 @@ public class Parser {
             );
         }
     }
+
+    // -------------------------------------------------------------------------------------------------------------------------------------
+    //
+    // Os métodos abaixo eles fazem apenas a análise sintática
+    //
+    // -------------------------------------------------------------------------------------------------------------------------------------
 
     /**
      * Método que "starta" o processo de análise sintática
@@ -115,6 +134,7 @@ public class Parser {
             this.commands();
         }
     }
+
 
     /**
      * Método que realiza a análise das expressões aritméticas (E), ou seja, este é a tradução direta da regra:<br>
@@ -297,6 +317,201 @@ public class Parser {
                 ", column " + this.peek().getColumn() +
                 ": invalid lexeme " + this.peek().getLexeme()
             );
+        }
+    }
+
+    // -------------------------------------------------------------------------------------------------------------------------------------
+    //
+    // Os métodos abaixo eles fazem a análise sintática e retorna uma AST (abstract sintax tree)
+    //
+    // -------------------------------------------------------------------------------------------------------------------------------------
+
+    public Cmd parseAST() {
+        Cmd program = this.astCommands();
+        if (this.peek().getType() != Token.Type.EOF) {
+            Token t = this.peek();
+            throw new RuntimeException( "Error at line " + t.getLine() + ", column " + t.getColumn() + ": unexpected token " + t.getLexeme());
+        }
+        return program;
+    }
+
+    private Cmd astCommands() {
+        ArrayList<Cmd> cmds = new ArrayList<>();
+        while (this.peek().getType() == Token.Type.ID || this.peek().getType() == Token.Type.SKIP || this.peek().getType() == Token.Type.IF || this.peek().getType() == Token.Type.WHILE) {
+            cmds.add(this.astCommand());
+        }
+        if (cmds.isEmpty()) {
+            throw new RuntimeException("Empty command block not allowed");
+        }
+        return cmds.size() == 1 ? cmds.get(0) : new Block(cmds);
+    }
+
+    /**
+     * Método que realiza a análise dos comandos (C) da linguagem WHILE e cria a AST, ou seja, este é a tradução diretas da regras:<br>
+     * 
+     * C &Rightarrow; id:E;C | skip;C | if (B) { C } else { C } | if (B) { C } else { C } C |  While (B) { cmd } |  While (B) { cmd } C | &lambda;
+     */
+    private Cmd astCommand() {
+        if(this.peek().getType() == Token.Type.ID){
+            Token id = this.peek();
+            this.consume(Token.Type.ID);
+            this.consume(Token.Type.ASSIGN);
+            Expr value = this.astArithmeticsExp();
+            this.consume(Token.Type.SEMICOLON);
+            return new Assign(id, value);
+        } else if (this.peek().getType() == Token.Type.SKIP){
+            this.consume(Token.Type.SKIP);
+            this.consume(Token.Type.SEMICOLON);
+            return new Skip();
+        } else if (this.peek().getType() == Token.Type.IF) {
+            this.consume(Token.Type.IF);
+            this.consume(Token.Type.LEFTP);
+            Expr condition = this.astBooleanExp();
+            this.consume(Token.Type.RIGHTP);
+            this.consume(Token.Type.THEN);
+            this.consume(Token.Type.LEFTK);
+            Cmd thenBranch = this.astCommands();
+            this.consume(Token.Type.RIGHTK);
+            this.consume(Token.Type.ELSE);
+            this.consume(Token.Type.LEFTK);
+            Cmd elseBranch = this.astCommands();
+            this.consume(Token.Type.RIGHTK);
+            return new Conditional(condition, thenBranch, elseBranch);
+        } else if (this.peek().getType() == Token.Type.WHILE) {
+            this.consume(Token.Type.WHILE);
+            this.consume(Token.Type.LEFTP);
+            Expr condition = this.astBooleanExp();
+            this.consume(Token.Type.RIGHTP);
+            this.consume(Token.Type.LEFTK);
+            Cmd body = this.astCommands();
+            this.consume(Token.Type.RIGHTK);
+            return new Loop(condition, body);
+        } else {
+            throw new RuntimeException("Error at line " + peek().getLine() + ", column " + peek().getColumn() + ": invalid command starting with " + peek().getLexeme());
+        }
+    }
+
+    private Expr astArithmeticsExp() {
+        Expr left = this.astTerm();
+        return this.astExpLine(left);
+    }
+
+    private Expr astTerm() {
+        Expr left = this.astFactor();
+        return this.astTermLine(left);
+    }
+
+    private Expr astExpLine(Expr left) {
+        if (this.peek().getType() == Token.Type.PLUS ||  this.peek().getType() == Token.Type.MINUS) {
+            Token op = this.peek();
+            this.consume(op.getType());
+            Expr right = this.astTerm();
+            Expr newLeft = new Binary(left, op, right);
+            return this.astExpLine(newLeft);
+        }
+        return left;
+    }
+    
+    private Expr astTermLine(Expr left) {
+        if (this.peek().getType() == Token.Type.PRODUCT) {
+            Token op = this.peek();
+            this.consume(Token.Type.PRODUCT);
+            Expr right = this.astFactor();
+            Expr newLeft = new Binary(left, op, right);
+            return this.astTermLine(newLeft);
+        }
+        return left;
+    }
+
+    private Expr astFactor() {
+        Token t = this.peek();
+        if (t.getType() == Token.Type.ID) {
+            this.consume(Token.Type.ID);
+            return new Variable(t);
+        } else if (t.getType() == Token.Type.NUMBER) {
+            this.consume(Token.Type.NUMBER);
+            return new Literal(t);
+        } else if (t.getType() == Token.Type.LEFTP) {
+            this.consume(Token.Type.LEFTP);
+            Expr expr = this.astArithmeticsExp();
+            this.consume(Token.Type.RIGHTP);
+            return expr;
+        }
+        throw new RuntimeException("Invalid factor: " + t);
+    }
+
+    private Expr astBooleanExp() {
+        Expr left = this.astTermBoolean();
+        return this.astTermOrBoolean(left);
+    }
+
+    private Expr astTermOrBoolean(Expr left) {
+        if (this.peek().getType() == Token.Type.OR) {
+            Token op = this.peek();
+            this.consume(Token.Type.OR);
+            Expr right = this.astTermBoolean();
+            Expr newLeft = new Binary(left, op, right);
+            return this.astTermOrBoolean(newLeft);
+        }
+        return left;
+    }
+
+    private Expr astTermBoolean() {
+        Expr left = this.astBooleanFactor();
+        return this.astTermAndBoolean(left);
+    }
+
+    private Expr astTermAndBoolean(Expr left) {
+        if (this.peek().getType() == Token.Type.AND) {
+            Token op = this.peek();
+            this.consume(Token.Type.AND);
+            Expr right = this.astBooleanFactor();
+            Expr newLeft = new Binary(left, op, right);
+            return this.astTermAndBoolean(newLeft);
+        }
+        return left;
+    }
+
+    private Expr astBooleanFactor() {
+        if (this.peek().getType() == Token.Type.NOT) {
+            Token op = this.peek();
+            this.consume(Token.Type.NOT);
+            Expr expr = this.astBooleanFactor();
+            return new Unary(op, expr);
+        } else if (this.peek().getType() == Token.Type.LEFTP) {
+            this.consume(Token.Type.LEFTP);
+            Expr expr = this.astBooleanExp();
+            this.consume(Token.Type.RIGHTP);
+            return expr;
+        } else {
+            Token token = this.peek();
+            if (token.getType() == Token.Type.TRUE || token.getType() == Token.Type.FALSE) {
+                this.consume(token.getType());
+                return new Literal(token);
+            }
+            if (token.getType() == Token.Type.ID || token.getType() == Token.Type.NUMBER) {
+                this.consume(token.getType());
+                Expr left = (token.getType() == Token.Type.ID) ? new Variable(token) : new Literal(token);
+                if (this.peek().getType() == Token.Type.LESS || this.peek().getType() == Token.Type.EQUAL) {
+                    Token op = this.peek();
+                    this.consume(op.getType());
+                    Token rightToken = this.peek();
+                    if (rightToken.getType() == Token.Type.ID || rightToken.getType() == Token.Type.NUMBER || rightToken.getType() == Token.Type.TRUE || rightToken.getType() == Token.Type.FALSE) { 
+                        this.consume(rightToken.getType());
+                        Expr right = (rightToken.getType() == Token.Type.ID) ? new Variable(rightToken) : new Literal(rightToken);
+                        return new Binary(left, op, right);
+                    } else {
+                        throw new RuntimeException(
+                            "Error at line " + rightToken.getLine() +
+                            ", column " + rightToken.getColumn() +
+                            ": invalid relation operand " + rightToken.getLexeme()
+                        );
+                    }
+                } else {
+                    throw new RuntimeException( "Error at line " + token.getLine() + ", column " + token.getColumn() + ": ID/NUMBER cannot appear without a relation in boolean expression");
+                }
+            }
+            throw new RuntimeException("Unexpected token in boolean expression: " + token.getType());
         }
     }
 

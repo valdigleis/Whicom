@@ -24,17 +24,28 @@
  */
 package site.valdigleis.whicom.ast;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class Block extends Cmd {
 
-    private final List<Cmd> statements;
+    private final ArrayList<Cmd> commands;
 
-    public Block(List<Cmd> statements) {
-        this.statements = statements;
+    public Block(ArrayList<Cmd> commands) {
+        this.commands = commands;
     }
 
-    public List<Cmd> getStatements() {
-        return statements;
+    public ArrayList<Cmd> getCommands() {
+        return commands;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Block{\n");
+        for (Cmd cmd : this.commands) {
+            sb.append("  ").append(cmd.toString().replace("\n", "\n  ")).append("\n");
+        }
+        sb.append("}");
+        return sb.toString();
     }
 }

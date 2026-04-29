@@ -50,5 +50,10 @@ public class Binary extends Expr {
         return right;
     }
 
+    @Override
+    public String toString() {
+        return "Binary(" + this.left.toString() + " " + this.operator.getLexeme() + " " + this.right.toString() + ")";
+    }
+
     
 }

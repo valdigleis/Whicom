@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+import site.valdigleis.whicom.ast.Cmd;
+import site.valdigleis.whicom.ast.ASTPrinter;
+
 public class ParserTest {
     
     @Test
@@ -75,4 +78,14 @@ public class ParserTest {
         Parser parser = new Parser(tokens);
         parser.parse();
     }
+
+    @Test
+    public void testSimpleASTGenerate() {
+        ArrayList<Token> tokens = new Lexer("x: 0; y : 49; z: x; while (x < y) { z: z + 1; x: var * z;} if (!(true) or (!(false) and x = y)) then {skip;} else {skip;}").tokenize();
+        Parser parser = new Parser(tokens);
+        Cmd program = parser.parseAST();
+        ASTPrinter printer = new ASTPrinter();
+        System.out.println(printer.print(program));
+    }
+
 }
