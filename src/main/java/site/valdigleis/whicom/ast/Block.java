@@ -41,11 +41,10 @@ public class Block extends Cmd {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Block{\n");
+        sb.append("Block. . .\n\t");
         for (Cmd cmd : this.commands) {
             sb.append("  ").append(cmd.toString().replace("\n", "\n  ")).append("\n");
         }
-        sb.append("}");
         return sb.toString();
     }
 }

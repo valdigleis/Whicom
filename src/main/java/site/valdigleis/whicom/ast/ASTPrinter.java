@@ -13,7 +13,7 @@ public class ASTPrinter {
         }
         if (cmd instanceof Block b) {
             StringBuilder sb = new StringBuilder();
-            sb.append(pad).append("Block\n");
+            sb.append(pad).append("Block. . .\n");
             for (Cmd c : b.getCommands()) {
                 sb.append(visit(c, indent + 1)).append("\n");
             }
@@ -25,10 +25,10 @@ public class ASTPrinter {
         }
 
         if (cmd instanceof Loop l) {
-            return pad + "While (\n" + this.visitExpr(l.getCondition(), indent + 1) + "\n" + pad + ") {\n" + this.visit(l.getBody(), indent + 1) + "\n" + pad + "}";
+            return pad + "While " + this.visitExpr(l.getCondition(), indent + 1) + "\n" + pad + "\n" + this.visit(l.getBody(), indent + 1) + "\n" + pad + "";
         }
         if (cmd instanceof Conditional c) {
-            return pad + "If (\n" + visitExpr(c.getCondition(), indent + 1) + "\n" + pad + ") Then {\n" + visit(c.getThenBranch(), indent + 1) + "\n" + pad + "} Else {\n" + visit(c.getElseBranch(), indent + 1) + "\n" + pad + "}";
+            return pad + "If " + visitExpr(c.getCondition(), indent + 1) + " " + pad + " Then \n" + visit(c.getThenBranch(), indent + 1) + "\n" + pad + " Else \n" + visit(c.getElseBranch(), indent + 1) + "\n" + pad + "";
         }
         return pad + "UnknownCmd";
     }
