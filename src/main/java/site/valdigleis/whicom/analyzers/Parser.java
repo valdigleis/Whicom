@@ -53,7 +53,12 @@ public class Parser {
         if (this.peek().getType() == type) {
             this.lookahead++;
         } else {
-            throw new RuntimeException("Error: Expected " + type + " but it came " + peek().getType());
+            throw new RuntimeException(
+                "Error at line " + this.peek().getLine() +
+                ", column " + this.peek().getColumn() +
+                ": expected " + type +
+                " but found " + this.peek().getType()
+            );
         }
     }
 
@@ -76,10 +81,10 @@ public class Parser {
             this.consume(Token.Type.ID);
             this.consume(Token.Type.ASSIGN);
             this.arithmeticsExp();
-            this.consume(Token.Type.PUNCTUATION);
+            this.consume(Token.Type.SEMICOLON);
         } else if (this.peek().getType() == Token.Type.SKIP){
             this.consume(Token.Type.SKIP);
-            this.consume(Token.Type.PUNCTUATION);
+            this.consume(Token.Type.SEMICOLON);
         } else if (this.peek().getType() == Token.Type.IF) {
             this.consume(Token.Type.IF);
             this.consume(Token.Type.LEFTP);
@@ -102,7 +107,7 @@ public class Parser {
             this.commands();
             this.consume(Token.Type.RIGHTK);
         } else {
-            throw new RuntimeException("Commands cannot start with the tokien " + this.peek().toString());
+            throw new RuntimeException("Commands cannot start with the tokien: " + this.peek().toString());
         }
         // Trata as sequências de comandos
         Token.Type next = this.peek().getType();
@@ -130,6 +135,10 @@ public class Parser {
             this.consume(Token.Type.PLUS);
             this.term();
             this.expLine();
+        } else if (this.peek().getType() == Token.Type.MINUS) {
+            this.consume(Token.Type.MINUS);
+            this.term();
+            this.expLine();
         }
     }
 
@@ -150,12 +159,16 @@ public class Parser {
         if(this.peek().getType() == Token.Type.PRODUCT) {
             this.consume(Token.Type.PRODUCT);
             this.factor();
-            this.expLine();
+            this.termLine();
         }
     }
 
     /** 
-     * Método que consome um fator de uma expressão aritmética, quando o fator for válido (ou seja, quando o fator é um ID ou um valor numérico).
+     * Método que consome um fator de uma expressão aritmética, quando o fator for válido (ou seja, quando o fator é um ID ou um valor numérico). Ou seja, implementa as regras:<br>
+     * 
+     * F  &Rightarrow;  ID | NUMBER | (E)<br>
+     * 
+     * onde NUMBER é um lexema de um número natural e ID é o lexema de um identificador válido.
      * 
      * @throws RuntimeException Lançada quando o fator não é válido!
      * */
@@ -164,21 +177,38 @@ public class Parser {
             this.consume(Token.Type.ID);
         } else if(this.peek().getType() == Token.Type.NUMBER) {
             this.consume(Token.Type.NUMBER);
+        } else if (this.peek().getType() == Token.Type.LEFTP) {
+            this.consume(Token.Type.LEFTP);
+            this.arithmeticsExp();
+             this.consume(Token.Type.RIGHTP);
         } else {
-            throw new RuntimeException(this.peek().getType() + "Not is valid factor!");
+            throw new RuntimeException("Error in line: " + this.peek().getLine() + " column: " + this.peek().getColumn() + "caused by " + this.peek().getLexeme() + " cannot used an arithmetic expression");
         }
     }
 
+    /**
+     * Método que realiza a análise das expressões booleana (B), ou seja, este é a tradução direta da regra:<br>
+     * 
+     * B &Rightarrow; T'B'
+     */
     private void booleanExp(){
         this.termBoolean();
         this.termOrBoolean();
     }
 
+    /**
+     * Método que realiza a análise dos sutermos booleanos (T') aninhados a uma expressão booleana que possivelmente apresenta conjunção, ou seja, este método é a tradução direta das regras gramaticais:<br> 
+     * T' &Rightarrow; F'C | &lambda;
+     */
     private void termBoolean(){
         this.booleanFactor();
         this.termAndBoolean();
     }
 
+    /**
+     * Método que realiza a análise dos sutermos conjuntivos (B') aninhados a uma expressão booleana, ou seja, este método é a tradução direta das regras gramaticais:<br> 
+     * C' &Rightarrow; and F'C' | &lambda;
+     */
     private void termAndBoolean(){
         if(this.peek().getType() == Token.Type.AND){
             this.consume(Token.Type.AND);
@@ -187,6 +217,11 @@ public class Parser {
         }
     }
 
+    /**
+     * Método que realiza a análise das subtermo booleano (B') com uma possível disjunção no corpo do termo, ou seja, este é a tradução direta da regra:<br>
+     * 
+     * B' &Rightarrow; or T'B'
+     */
     private void termOrBoolean(){
         if(this.peek().getType() == Token.Type.OR){
             this.consume(Token.Type.OR);
@@ -195,6 +230,15 @@ public class Parser {
         }
     }
 
+    /** 
+     * Método que consome um fator de uma expressão booleana, quando o fator for válido (ou seja, quando o fator for true, false ou uma comparação usando < ou =). Ou seja, implementa as regras:<br>
+     * 
+     * F' &Rightarrow; !F' | (B) | true R | false R | ID R | NUMBER D<br>
+     * 
+     * onde NUMBER é um lexema de um número natural e ID é o lexema de um identificador válido.
+     * 
+     * @throws RuntimeException Lançada quando o fator booleano não é válido!
+     * */
     private void booleanFactor(){
         if(this.peek().getType() == Token.Type.NOT){
             this.consume(Token.Type.NOT);
@@ -220,6 +264,11 @@ public class Parser {
          
     }
 
+    /**
+     * Método que realiza o consumo dos operadores < e = nos fatores booleanos. Ou seja, implementa as regras:<br>
+     * 
+     * R  &Rightarrow; < R' | = R'
+     */
     private void relations() {
         if (this.peek().getType() == Token.Type.LESS) {
             this.consume(Token.Type.LESS);
@@ -230,13 +279,24 @@ public class Parser {
         }
     }
 
+    /**
+     * Métrodo que realiza o consumo do segundo fator em uma comparação, ou seja,  implementa as regras:<br>
+     * 
+     * R' &Rightarrow; ID | NUMBER | true | false<br>
+     * 
+     * onde NUMBER é um lexema de um número natural e ID é o lexema de um identificador válido.
+     */
     private void relationFactor(){
         Token.Type type = this.peek().getType();
         if (type == Token.Type.ID || type == Token.Type.NUMBER || 
             type == Token.Type.TRUE || type == Token.Type.FALSE) {
             this.consume(type);
         } else {
-            throw new RuntimeException("Expected value after relational operator, but found " + type);
+            throw new RuntimeException(
+                "Error on line " + this.peek().getLine() +
+                ", column " + this.peek().getColumn() +
+                ": invalid lexeme " + this.peek().getLexeme()
+            );
         }
     }
 

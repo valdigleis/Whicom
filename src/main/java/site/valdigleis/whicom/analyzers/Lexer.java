@@ -30,48 +30,70 @@ public class Lexer {
 
     private final String word;
     private int ref;
+    private int line;
+    private int column;
 
     public Lexer(String word) {
         this.word = word;
         this.ref = 0;
+        this.line = 1;
+        this.column = 1;
     }
 
     private Token readIdentifier() {
         StringBuilder sb = new StringBuilder();
+        int lineRef = this.line;
+        int columnRef = this.column;
         while (this.ref < this.word.length() && Character.isLetterOrDigit(this.word.charAt(this.ref))) {
             sb.append(this.word.charAt(this.ref));
-            this.ref++;
+            this.advance();
         }
         String text = sb.toString();
         switch (text) {
-            case "while" : return new Token(text, Token.Type.WHILE);
-            case "if":   return new Token(text, Token.Type.IF);
-            case "then": return new Token(text, Token.Type.THEN);
-            case "else": return new Token(text, Token.Type.ELSE);
-            case "skip": return new Token(text, Token.Type.SKIP);
-            case "true": return new Token(text, Token.Type.TRUE);
-            case "false": return new Token(text, Token.Type.FALSE);
-            case "and": return new Token(text, Token.Type.AND);
-            case "or": return new Token(text, Token.Type.OR);
-            default:     return new Token(text, Token.Type.ID);
+            case "while" : 
+                return new Token(text, Token.Type.WHILE, lineRef, columnRef);
+            case "if":
+                return new Token(text, Token.Type.IF, lineRef, columnRef);
+            case "then":
+                return new Token(text, Token.Type.THEN, lineRef, columnRef);
+            case "else":
+                return new Token(text, Token.Type.ELSE, lineRef, columnRef);
+            case "skip":
+                return new Token(text, Token.Type.SKIP, lineRef, columnRef);
+            case "true":
+                return new Token(text, Token.Type.TRUE, lineRef, columnRef);
+            case "false":
+                return new Token(text, Token.Type.FALSE, lineRef, columnRef);
+            case "and":
+                return new Token(text, Token.Type.AND, lineRef, columnRef);
+            case "or":
+                return new Token(text, Token.Type.OR, lineRef, columnRef);
+            default:
+                return new Token(text, Token.Type.ID, lineRef, columnRef);
         }
     }
 
     private Token readNumber() {
         StringBuilder sb = new StringBuilder();
+        int lineRef = this.line;
+        int columnRef = this.column;
         while (this.ref < this.word.length() && Character.isDigit(this.word.charAt(this.ref))) {
             sb.append(this.word.charAt(this.ref));
-            this.ref++;
+            lineRef = this.line;
+            columnRef = this.column;
+            this.advance();
         }
-        return new Token(sb.toString(), Token.Type.NUMBER);
+        return new Token(sb.toString(), Token.Type.NUMBER, lineRef, columnRef);
     }
 
     public ArrayList<Token> tokenize() {
         ArrayList<Token> tokens = new ArrayList<>();
         while (this.ref < this.word.length()) {
-            char current = this.word.charAt(this.ref);
+            char current = this.word.charAt(this.ref);    
+            int lineRef = this.line;
+            int columnRef = this.column;
             if (Character.isWhitespace(current)) {
-                this.ref++;
+                this.advance();
                 continue;
             }
             if (Character.isLetter(current)) {
@@ -79,46 +101,61 @@ public class Lexer {
             }else if (Character.isDigit(current)) {
                 tokens.add(readNumber());
             } else if (current == ':') {
-                tokens.add(new Token(":", Token.Type.ASSIGN));
-                this.ref++;
+                tokens.add(new Token(":", Token.Type.ASSIGN, lineRef, columnRef));
+                this.advance();
             } else if (current == '=') {
-                tokens.add(new Token("=", Token.Type.EQUAL));
-                this.ref++;
+                tokens.add(new Token("=", Token.Type.EQUAL, lineRef, columnRef));
+                this.advance();
             } else if (current == '<') {
-                tokens.add(new Token("<", Token.Type.LESS));
-                this.ref++;
+                tokens.add(new Token("<", Token.Type.LESS, lineRef, columnRef));
+                this.advance();
             } else if (current == '+') {
-                tokens.add(new Token("+", Token.Type.PLUS));
-                this.ref++;
+                tokens.add(new Token("+", Token.Type.PLUS, lineRef, columnRef));
+                this.advance();
             } else if (current == '-') {
-                tokens.add(new Token("-", Token.Type.MINUS));
-                this.ref++;
+                tokens.add(new Token("-", Token.Type.MINUS, lineRef, columnRef));
+                this.advance();
             } else if (current == '*') {
-                tokens.add(new Token("*", Token.Type.PRODUCT));
-                this.ref++;
+                tokens.add(new Token("*", Token.Type.PRODUCT, lineRef, columnRef));
+                this.advance();
             } else if (current == ';') {
-                tokens.add(new Token(";", Token.Type.PUNCTUATION));
-                this.ref++;
+                tokens.add(new Token(";", Token.Type.SEMICOLON, lineRef, columnRef));
+                this.advance();
             } else if (current == '!') {
-                tokens.add(new Token("!", Token.Type.NOT));
-                this.ref++;
+                tokens.add(new Token("!", Token.Type.NOT, lineRef, columnRef));
+                this.advance();
             } else if (current == '(') {
-                tokens.add(new Token("(", Token.Type.LEFTP));
-                this.ref++;
+                tokens.add(new Token("(", Token.Type.LEFTP, lineRef, columnRef));
+                this.advance();
             } else if (current == ')') {
-                tokens.add(new Token(")", Token.Type.RIGHTP));
-                this.ref++;
+                tokens.add(new Token(")", Token.Type.RIGHTP, lineRef, columnRef));
+                this.advance();
             } else if (current == '{') {
-                tokens.add(new Token("{", Token.Type.LEFTK));
-                this.ref++;
+                tokens.add(new Token("{", Token.Type.LEFTK, lineRef, columnRef));
+                this.advance();
             } else if (current == '}') {
-                tokens.add(new Token("}", Token.Type.RIGHTK));
-                this.ref++;
+                tokens.add(new Token("}", Token.Type.RIGHTK, lineRef, columnRef));
+                this.advance();
             } else {
                 throw new RuntimeException("Unexpected character: " + current);
             }
         }
-        tokens.add(new Token("", Token.Type.EOF));
+        tokens.add(new Token("", Token.Type.EOF, this.line, this.column));
         return tokens;
     }
+
+    private void advance() {
+        if (ref >= this.word.length()) {
+            return;
+        }
+        char c = word.charAt(ref);
+        this.ref++;
+        if (c == '\n') {
+            this.line++;
+            this.column = 1;
+        } else {
+            this.column++;
+        }
+    }
+
 }

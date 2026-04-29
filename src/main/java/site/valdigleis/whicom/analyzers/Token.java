@@ -24,15 +24,21 @@
  */
 package site.valdigleis.whicom.analyzers;
 
+import java.util.Objects;
+
 public class Token {
     
-    public enum Type { ID, NUMBER, ASSIGN, PLUS, MINUS, PRODUCT, LESS, EQUAL, PUNCTUATION, IF, THEN, ELSE, WHILE, SKIP, TRUE, FALSE, NOT, AND, OR, LEFTP, RIGHTP, LEFTK, RIGHTK, EOF }
+    public enum Type { ID, NUMBER, ASSIGN, PLUS, MINUS, PRODUCT, LESS, EQUAL, SEMICOLON, IF, THEN, ELSE, WHILE, SKIP, TRUE, FALSE, NOT, AND, OR, LEFTP, RIGHTP, LEFTK, RIGHTK, EOF }
     private final Type type;
     private final String lexeme;
+    private final int line;
+    private final int column;
 
-    public Token(String lexeme, Type type) {
+    public Token(String lexeme, Type type, int line, int column) {
         this.type = type;
         this.lexeme = lexeme;
+        this.line = line;
+        this.column = column;
     }
 
     public String getLexeme() {
@@ -43,8 +49,33 @@ public class Token {
         return type;
     }
 
+    public int getLine() {
+        return line;
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
     @Override
     public String toString() {
-        return "<'" + lexeme + "', " + type  + ">";
+        return "<'" + lexeme + "', " + type  + ", line: " + this.line + ", column: " + this.column + ">";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Token other = (Token) obj;
+        return this.type == other.type && this.lexeme.equals(other.getLexeme()) && this.line == other.getLine() && this.column == other.getColumn();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.type, this.lexeme, this.line, this.column);
     }
 }

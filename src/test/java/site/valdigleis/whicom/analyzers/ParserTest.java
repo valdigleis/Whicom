@@ -55,8 +55,23 @@ public class ParserTest {
         parser.parse();
     }
 
-    public void testSimpleProgram() {
+    @Test
+    public void testOneProgram() {
         ArrayList<Token> tokens = new Lexer("x: 0; y : 49; z: x; while (x < y) { z: z + 1; x: z * z;} if (!(true)) then {skip;} else {skip;}").tokenize();
+        Parser parser = new Parser(tokens);
+        parser.parse();
+    }
+
+    @Test
+    public void testTwoProgram() {
+        ArrayList<Token> tokens = new Lexer("x: 0; y : 49; z: x; while (x < y) { z: z + 1; x: z * z;} if (!(true) and (!(false) or x = y)) then {skip;} else {skip;}").tokenize();
+        Parser parser = new Parser(tokens);
+        parser.parse();
+    }
+
+    @Test
+    public void testThreeProgram() {
+        ArrayList<Token> tokens = new Lexer("x: 0; y : 49; z: x; while (x < y) { z: z + 1; x: var * z;} if (!(true) or (!(false) and x = y)) then {skip;} else {skip;}").tokenize();
         Parser parser = new Parser(tokens);
         parser.parse();
     }

@@ -31,6 +31,15 @@ import java.util.ArrayList;
 import org.junit.Test;
 
 public class LexerTest {
+
+    @Test
+    public void aqui(){
+        Lexer lexer = new Lexer("x: 0; y : 49; z: x; while (x < y) { z: z + 1; x: z * z;}\n if (!(true) and (!(false) or x = y)) then {skip;} else {skip;}");
+        ArrayList<Token> tokens = lexer.tokenize();
+        for (Token token : tokens) {
+            System.out.println(token.toString());
+        }
+    }
     
     @Test
     public void testTokenizeKeywords() {
@@ -60,7 +69,7 @@ public class LexerTest {
         assertEquals(Token.Type.PLUS, tokens.get(3).getType());
         assertEquals(Token.Type.MINUS, tokens.get(4).getType());
         assertEquals(Token.Type.PRODUCT, tokens.get(5).getType());
-        assertEquals(Token.Type.PUNCTUATION, tokens.get(6).getType());
+        assertEquals(Token.Type.SEMICOLON, tokens.get(6).getType());
         assertEquals(Token.Type.NOT, tokens.get(7).getType());
         assertEquals(Token.Type.LEFTP, tokens.get(8).getType());
         assertEquals(Token.Type.RIGHTP, tokens.get(9).getType());
