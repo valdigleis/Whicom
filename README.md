@@ -4,7 +4,7 @@ Whicom é um pequeno compilador para a clássica linguagem  WHILE, o compilador 
 
 ## A Linguagem e o Compilador
 
-linguagem  essa muito popular no estudo de especificações formais e corretude de programas através do uso de lógica de Hoare (1934–2026). A gramática que descreve os programas (palavras) em WHILE é dada por:
+While é muito popular no estudo de especificações formais e corretude de programas através do uso de lógica de Hoare (1934–2026). A gramática que descreve os programas (palavras) em WHILE é dada por:
 
 
 #### Comandos
