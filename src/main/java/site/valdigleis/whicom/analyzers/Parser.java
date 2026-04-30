@@ -326,6 +326,11 @@ public class Parser {
     //
     // -------------------------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Método que executa a análise sintática e ao mesmo tempo realiza a construção da árvore sintática abstrata (AST - Abstract sintatic tree).
+     * 
+     * @return A AST construída
+     */
     public Cmd parseAST() {
         Cmd program = this.astCommands();
         if (this.peek().getType() != Token.Type.EOF) {
@@ -335,6 +340,12 @@ public class Parser {
         return program;
     }
 
+    /**
+     * Método que realiza a análise sintática dos comandos concatenados.
+     * 
+     * @return A AST construída usando os comandos concatenados
+     * @throws RuntimeException Quando os blocos de comandos são vazios
+     */
     private Cmd astCommands() {
         ArrayList<Cmd> cmds = new ArrayList<>();
         while (this.peek().getType() == Token.Type.ID || this.peek().getType() == Token.Type.SKIP || this.peek().getType() == Token.Type.IF || this.peek().getType() == Token.Type.WHILE) {
@@ -391,16 +402,32 @@ public class Parser {
         }
     }
 
+    /**
+     * Método que analisa uma expressão aritmética e retorna uma Expressão em formato apropriado para a AST
+     * 
+     * @return A expressão limpa (sem símbolos sintático irrelevantes) para necessária para construir a AST
+     */
     private Expr astArithmeticsExp() {
-        Expr left = this.astTerm();
-        return this.astExpLine(left);
+        Expr expr = this.astTerm();
+        return this.astExpLine(expr);
     }
 
+    /**
+     * Método que analisa um termo em uma expressão aritmética e retorna uma Expressão em formato apropriado para a AST
+     * 
+     * @return A expressão limpa (sem símbolos sintático irrelevantes) para necessária para construir a AST
+     */
     private Expr astTerm() {
-        Expr left = this.astFactor();
-        return this.astTermLine(left);
+        Expr term = this.astFactor();
+        return this.astTermLine(term);
     }
 
+    /**
+     * Método que realiza a construção de uma expressão aditiva a partir de uma expressão à esquerda
+     * 
+     * @param left A expressão esquerda necessárias
+     * @return A expressão limpa (sem símbolos sintático irrelevantes) para necessária para construir a AST
+     */
     private Expr astExpLine(Expr left) {
         if (this.peek().getType() == Token.Type.PLUS ||  this.peek().getType() == Token.Type.MINUS) {
             Token op = this.peek();
@@ -412,6 +439,12 @@ public class Parser {
         return left;
     }
     
+    /**
+     * Método que realiza a construção de uma expressão multiplicativa a partir de uma expressão à esquerda
+     * 
+     * @param left A expressão esquerda necessárias
+     * @return A expressão limpa (sem símbolos sintático irrelevantes) para necessária para construir a AST
+     */
     private Expr astTermLine(Expr left) {
         if (this.peek().getType() == Token.Type.PRODUCT) {
             Token op = this.peek();
@@ -423,6 +456,12 @@ public class Parser {
         return left;
     }
 
+    /**
+     * Método que realiza a construção de um fator aritmético fundamental.
+     * 
+     * @return O fator limpo (apenas o fator puro, sem parênteses)
+     * @throws RuntimeException quando o token é um fator inválido
+     */
     private Expr astFactor() {
         Token t = this.peek();
         if (t.getType() == Token.Type.ID) {
@@ -440,11 +479,22 @@ public class Parser {
         throw new RuntimeException("Invalid factor: " + t);
     }
 
+    /**
+     * Método que analisa uma expressão booleana e retorna uma Expressão em formato apropriado, ou seja, formado limpo, para a AST
+     * 
+     * @return A expressão limpa (sem símbolos sintático irrelevantes) para necessária para construir a AST
+     */
     private Expr astBooleanExp() {
         Expr left = this.astTermBoolean();
         return this.astTermOrBoolean(left);
     }
 
+    /**
+     * Método que analisa um termo disjuntivo em uma expressão booleana e retorna uma Expressão em formato apropriado para a AST
+     * 
+     * @param left A expressão base
+     * @return A expressão limpa para construir a AST
+     */
     private Expr astTermOrBoolean(Expr left) {
         if (this.peek().getType() == Token.Type.OR) {
             Token op = this.peek();
@@ -456,11 +506,22 @@ public class Parser {
         return left;
     }
 
+    /**
+     * Método que analisa um termo em uma expressão booleana e retorna uma Expressão booleana conjuntiva em formato apropriado para a AST
+     * 
+     * @return A expressão limpa para construir a AST
+     */
     private Expr astTermBoolean() {
         Expr left = this.astBooleanFactor();
         return this.astTermAndBoolean(left);
     }
 
+    /**
+     * Método que analisa um termo conjuntivo em uma expressão booleana e retorna uma Expressão em formato apropriado para a AST
+     * 
+     * @param left A expressão base
+     * @return A expressão limpa para construir a AST
+     */
     private Expr astTermAndBoolean(Expr left) {
         if (this.peek().getType() == Token.Type.AND) {
             Token op = this.peek();
@@ -472,6 +533,12 @@ public class Parser {
         return left;
     }
 
+    /**
+     * Método que realiza a construção de um fator booleano fundamental.
+     * 
+     * @return O fator limpo (apenas o fator puro, sem parênteses)
+     * @throws RuntimeException quando o token é um fator inválido
+     */
     private Expr astBooleanFactor() {
         if (this.peek().getType() == Token.Type.NOT) {
             Token op = this.peek();
