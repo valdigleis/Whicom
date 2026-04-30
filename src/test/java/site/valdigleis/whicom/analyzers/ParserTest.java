@@ -81,7 +81,7 @@ public class ParserTest {
 
     @Test
     public void testSimpleASTGenerate() {
-        ArrayList<Token> tokens = new Lexer("x: 0; y : 49; z: x; while (x < y) { z: z + 1; x: var * z;} if (!(true) or (!(false) and x = y)) then {x : 17; y: x-id;} else {x : z - 1;}").tokenize();
+        ArrayList<Token> tokens = new Lexer("x: 0; y : 49; z: x; while (x < y) { z: z + 1; x: var * z;} if (!(true) or (!(false) and x = y)) then {x : 17; y: x-id;} else {x : z - 1; skip; skip; y: id;}").tokenize();
         Parser parser = new Parser(tokens);
         Cmd program = parser.parseAST();
         ASTPrinter printer = new ASTPrinter();

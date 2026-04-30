@@ -25,10 +25,10 @@ public class ASTPrinter {
         }
 
         if (cmd instanceof Loop l) {
-            return pad + "While " + this.visitExpr(l.getCondition(), indent + 1) + "\n" + pad + "\n" + this.visit(l.getBody(), indent + 1) + "\n" + pad + "";
+            return pad + "While " + this.visitExpr(l.getCondition(), indent + 1) + " " + "\n" + this.visit(l.getBody(), indent + 1) + pad;
         }
         if (cmd instanceof Conditional c) {
-            return pad + "If " + visitExpr(c.getCondition(), indent + 1) + " " + pad + " Then \n" + visit(c.getThenBranch(), indent + 1) + "\n" + pad + " Else \n" + visit(c.getElseBranch(), indent + 1) + "\n" + pad + "";
+            return pad + "If " + visitExpr(c.getCondition(), indent + 1) + " " + " Then \n" + visit(c.getThenBranch(), indent + 1) + "\n" + pad + " Else \n" + visit(c.getElseBranch(), indent + 1);
         }
         return pad + "UnknownCmd";
     }

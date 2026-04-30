@@ -41,9 +41,9 @@ public class Block extends Cmd {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Block. . .\n\t");
+        sb.append("Block. . .\n");
         for (Cmd cmd : this.commands) {
-            sb.append("  ").append(cmd.toString().replace("\n", "\n  ")).append("\n");
+            sb.append("  ").append(cmd.toString().replace("\n", "\n "));
         }
         return sb.toString();
     }
