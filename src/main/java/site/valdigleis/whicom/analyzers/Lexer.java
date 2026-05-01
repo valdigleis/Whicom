@@ -95,7 +95,18 @@ public class Lexer {
             if (Character.isWhitespace(current)) {
                 this.advance();
                 continue;
+            } 
+            // -------------------------------------------------------------------
+            // Detecta os comentários mais não insere ambos na lista de tokens
+            if (current == '/' && this.peek() == '/') {
+                this.skipLineComment();
+                continue;
             }
+            if (current == '/' && peek() == '*') {
+                this.skipBlockComment();
+                continue;
+            }
+            // -------------------------------------------------------------------
             if (Character.isLetter(current)) {
                 tokens.add(readIdentifier());
             }else if (Character.isDigit(current)) {
@@ -156,6 +167,35 @@ public class Lexer {
         } else {
             this.column++;
         }
+    }
+
+    private char peek() {
+        if (this.ref + 1 >= this.word.length()) {
+            return '\0';
+        }
+        return this.word.charAt(ref + 1);
+    }
+
+    private void skipLineComment() {
+        this.advance();
+        this.advance();
+        while (this.ref < word.length() && word.charAt(ref) != '\n') {
+            this.advance();
+        }
+    }
+
+    private void skipBlockComment() {
+        this.advance();
+        this.advance();
+        while (this.ref < word.length()) {
+            if (word.charAt(ref) == '*' && peek() == '/') {
+                advance(); // '*'
+                advance(); // '/'
+                return;
+            }
+            this.advance();
+        }
+        throw new RuntimeException("Comment from an unclosed block");
     }
 
 }
