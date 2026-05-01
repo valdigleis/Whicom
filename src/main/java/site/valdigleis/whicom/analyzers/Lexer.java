@@ -26,6 +26,13 @@ package site.valdigleis.whicom.analyzers;
 
 import java.util.ArrayList;
 
+/**
+ * Implementação de um analisador léxico para uma variação da linguagem WHILE.
+ * 
+ * @version 1.0
+ * @author Valdigleis (valdigleis@dimap.ufrn.br)
+ * @see <a href="https://dl.acm.org/doi/epdf/10.1145/363235.363259" targt="_blank">Hoare Paper</a>
+ */
 public class Lexer {
 
     private final String word;
@@ -33,6 +40,11 @@ public class Lexer {
     private int line;
     private int column;
 
+    /**
+     * Método que cria uma instância de um Lexer (Analisador léxico)
+     * 
+     * @param word O código que será analisado pelo Lexer
+     */
     public Lexer(String word) {
         this.word = word;
         this.ref = 0;
@@ -40,6 +52,11 @@ public class Lexer {
         this.column = 1;
     }
 
+    /**
+     * Método responsável por realizar a leitura de uma palavra e retorna a classe de token de tal palavra
+     * 
+     * @return O token que representa a palavra
+     */
     private Token readIdentifier() {
         StringBuilder sb = new StringBuilder();
         int lineRef = this.line;
@@ -73,6 +90,11 @@ public class Lexer {
         }
     }
 
+    /**
+     * Método responsável por realizar a leitura de um número e retorna a classe de token número
+     * 
+     * @return O token número que representa o número lido
+     */
     private Token readNumber() {
         StringBuilder sb = new StringBuilder();
         int lineRef = this.line;
@@ -86,6 +108,12 @@ public class Lexer {
         return new Token(sb.toString(), Token.Type.NUMBER, lineRef, columnRef);
     }
 
+    /**
+     * Método que constrói a lista de tokens a partir do código que criou o Lexer.
+     * 
+     * @return A lista de token
+     * @throws RuntimeException Quando uma sequência de caracteres inválida é encontrada
+     */
     public ArrayList<Token> tokenize() {
         ArrayList<Token> tokens = new ArrayList<>();
         while (this.ref < this.word.length()) {
@@ -155,6 +183,9 @@ public class Lexer {
         return tokens;
     }
 
+    /**
+     * Método responsável por manter os valores de localização (linha, coluna) das palavras no código atualizadas.
+     */
     private void advance() {
         if (ref >= this.word.length()) {
             return;
@@ -169,13 +200,21 @@ public class Lexer {
         }
     }
 
+    /**
+     * Método que retorna (sem apagar) o caractere que está sendo usado (mapeado pelo <em>lookahead</em>) para forma palavras ou números no analisador lexico
+     * 
+     * @return O caractere apontado no lookahead do analisador léxico
+     */
     private char peek() {
         if (this.ref + 1 >= this.word.length()) {
             return '\0';
         }
-        return this.word.charAt(ref + 1);
+        return this.word.charAt(this.ref + 1);
     }
 
+    /**
+     * Método responsável por analisar os comentários simples (de linha única)
+     */
     private void skipLineComment() {
         this.advance();
         this.advance();
@@ -184,6 +223,9 @@ public class Lexer {
         }
     }
 
+    /**
+     * Método responsável por analisar os comentários múltiplos (de múltiplas de linhas)
+     */
     private void skipBlockComment() {
         this.advance();
         this.advance();

@@ -1,10 +1,10 @@
 # Whicom
 
-Whicom é um pequeno compilador para a clássica linguagem  WHILE, o compilador está sendo escrito usando técnicas de **análise preditiva recursiva** para a construção do Analisador Sintático (Parser).
+Whicom é um pequeno compilador para uma versão simplificada da clássica linguagem  [WHILE](https://www.cs.cmu.edu/~aldrich/courses/15-819O-13sp/resources/while-language.pdf), o compilador está sendo escrito usando técnicas de **análise preditiva recursiva** para a construção do Analisador Sintático (Parser).
 
 ## A Linguagem e o Compilador
 
-WHILE é muito popular no estudo de especificações formais e corretude de programas, principalmente através do uso da lógica de Hoare (1934–2026). A gramática que descreve os programas (as palavras) em WHILE é dada por:
+WHILE é muito popular no estudo de especificações formais e corretude de programas, principalmente através do uso da [lógica de Hoare](https://en.wikipedia.org/wiki/Hoare_logic) (1934–2026). A gramática original considerada aqui para descrever os programas (as palavras) em WHILE é dada por:
 
 
 #### Comandos:
@@ -32,7 +32,7 @@ WHILE é muito popular no estudo de especificações formais e corretude de prog
 </div>
 
 
-#### Identificadores e números (terminais):
+#### Identificadores e números (Lexemas):
 
 <div align="center">
 
@@ -41,3 +41,5 @@ WHILE é muito popular no estudo de especificações formais e corretude de prog
 \<num\> &Rightarrow; 0 | . . . | 9 | 0\<num\> | . . . | 9\<num\>
 
 </div>
+
+Como foi usado a estratégia de análise preditiva recursiva para este projeto foi necessário realizar algumas pequenas alterações na gramática, ficando da seguinte forma.

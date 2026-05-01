@@ -30,8 +30,8 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import site.valdigleis.whicom.analyzers.Lexer;
+import site.valdigleis.whicom.analyzers.Parser;
 import site.valdigleis.whicom.analyzers.Token;
-import site.valdigleis.whicom.utils.Preprocessor;
 
 /**
  * 
@@ -50,11 +50,11 @@ public class Run {
         }
 
         byte[] bytes = Files.readAllBytes(Paths.get(filePath));
-        String text = new String(bytes);
-        String code = Preprocessor.removeComments(text);
+        String code = new String(bytes);
         Lexer lexer = new Lexer(code);
         List<Token> tokens = lexer.tokenize();
-
+        Parser parser = new Parser(tokens);
+        
         System.out.println("Hello, world!");
     }
 }

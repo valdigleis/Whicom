@@ -39,17 +39,32 @@ import site.valdigleis.whicom.ast.Skip;
 import site.valdigleis.whicom.ast.Unary;
 import site.valdigleis.whicom.ast.Variable;
 
+/**
+ * Implementação de um analisador sintático para uma variação da linguagem <a href="https://dl.acm.org/doi/epdf/10.1145/363235.363259" targt="_blank">WHILE</a>.
+ * 
+ * @version 1.0
+ * @author Valdigleis (valdigleis@dimap.ufrn.br)
+ * @see <a href="https://dl.acm.org/doi/epdf/10.1145/363235.363259" targt="_blank">Hoare Paper</a>
+ */
 public class Parser {
 
     private final List<Token> tokens;
     private int lookahead = 0;
 
-    
+    /**
+     * Método que cria uma instância de um Parser (Analisador sintático)
+     * 
+     * @param tokens Uma lista de tokens
+     */
     public Parser(List<Token> tokens) { 
         this.tokens = tokens; 
     }
 
-    
+    /**
+     * Método que retorna o token apontado pelo <em>lookahead</em> na lista de tokens.
+     * 
+     * @return
+     */
     private Token peek() { 
         return tokens.get(this.lookahead); 
     }

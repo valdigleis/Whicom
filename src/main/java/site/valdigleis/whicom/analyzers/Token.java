@@ -34,6 +34,14 @@ public class Token {
     private final int line;
     private final int column;
 
+    /**
+     * Método que cria um token válido
+     * 
+     * @param lexeme O valor do token
+     * @param type O tipo do token
+     * @param line A linha em que o token aparece no código fonte
+     * @param column A coluna em que o token aparece no código fonte
+     */
     public Token(String lexeme, Type type, int line, int column) {
         this.type = type;
         this.lexeme = lexeme;
@@ -41,18 +49,38 @@ public class Token {
         this.column = column;
     }
 
+    /**
+     * Método que retorna o valor do lexema no token
+     * 
+     * @return lexeme
+     */
     public String getLexeme() {
         return lexeme;
     }
 
+    /**
+     * Método que retorna o tipo do token
+     * 
+     * @return type
+     */
     public Type getType() {
         return type;
     }
 
+    /**
+     * Método que retorna o número da linha em que o token aparece no código fonte
+     * 
+     * @return linha
+     */
     public int getLine() {
         return line;
     }
 
+    /**
+     * Método que retorna o número da coluna em que o token aparece no código fonte
+     * 
+     * @return coluna
+     */
     public int getColumn() {
         return column;
     }
