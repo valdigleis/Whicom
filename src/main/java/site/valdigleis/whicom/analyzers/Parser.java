@@ -40,11 +40,11 @@ import site.valdigleis.whicom.ast.Unary;
 import site.valdigleis.whicom.ast.Variable;
 
 /**
- * Implementação de um analisador sintático para uma variação da linguagem <a href="https://dl.acm.org/doi/epdf/10.1145/363235.363259" targt="_blank">WHILE</a>.
+ * Implementação de um analisador sintático para uma variação da linguagem <a href="https://dl.acm.org/doi/epdf/10.1145/363235.363259" target="_blank">WHILE</a>.
  * 
  * @version 1.0
  * @author Valdigleis (valdigleis@dimap.ufrn.br)
- * @see <a href="https://dl.acm.org/doi/epdf/10.1145/363235.363259" targt="_blank">Hoare Paper</a>
+ * @see <a href="https://dl.acm.org/doi/epdf/10.1145/363235.363259" target="_blank">Hoare Paper</a>
  */
 public class Parser {
 
@@ -266,7 +266,7 @@ public class Parser {
     }
 
     /** 
-     * Método que consome um fator de uma expressão booleana, quando o fator for válido (ou seja, quando o fator for true, false ou uma comparação usando < ou =). Ou seja, implementa as regras:<br>
+     * Método que consome um fator de uma expressão booleana, quando o fator for válido (ou seja, quando o fator for true, false ou uma comparação usando &lt; ou =). Ou seja, implementa as regras:<br>
      * 
      * F' &Rightarrow; !F' | (B) | true R | false R | ID R | NUMBER D<br>
      * 
@@ -300,9 +300,9 @@ public class Parser {
     }
 
     /**
-     * Método que realiza o consumo dos operadores < e = nos fatores booleanos. Ou seja, implementa as regras:<br>
+     * Método que realiza o consumo dos operadores &lt; e = nos fatores booleanos. Ou seja, implementa as regras:<br>
      * 
-     * R  &Rightarrow; < R' | = R'
+     * R  &Rightarrow; &lt; R' | = R'
      */
     private void relations() {
         if (this.peek().getType() == Token.Type.LESS) {

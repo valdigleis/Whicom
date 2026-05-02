@@ -31,7 +31,7 @@ import java.util.ArrayList;
  * 
  * @version 1.0
  * @author Valdigleis (valdigleis@dimap.ufrn.br)
- * @see <a href="https://dl.acm.org/doi/epdf/10.1145/363235.363259" targt="_blank">Hoare Paper</a>
+ * @see <a href="https://dl.acm.org/doi/epdf/10.1145/363235.363259" target="_blank">Hoare Paper</a>
  */
 public class Lexer {
 
