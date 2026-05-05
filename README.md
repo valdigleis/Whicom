@@ -11,7 +11,7 @@ WHILE é muito popular no estudo de especificações formais e corretude de prog
 
 <div align="center">
 
-\<cmd\> &Rightarrow; \<skip\>; | \<id\> : \<E\> | if(\<B\>)then{\<cmd\>} else{\<cmd\>} | while(\<B\>){\<cmd\>} | \<skip\>;\<cmd\> | \<id\> : \<E\>;\<cmd\> |  if(\<B\>)then{\<cmd\>} else{\<cmd\>}\<cmd\> | while(\<B\>){\<cmd\>}\<cmd\>
+\<cmd\> &Rightarrow;  \<skip\>;\<cmd\> | \<id\> : \<E\>;\<cmd\> |  if(\<B\>)then{\<cmd\>} else{\<cmd\>}\<cmd\> | while(\<B\>){\<cmd\>}\<cmd\> | &lambda;
 
 </div>
 

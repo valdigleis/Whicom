@@ -79,14 +79,14 @@ public class Parser {
      */
     private void consume(Token.Type type) {
         if (this.peek().getType() == type) {
-            this.lookahead++;
+          this.lookahead++;
         } else {
-            throw new RuntimeException(
-                "Error at line " + this.peek().getLine() +
-                ", column " + this.peek().getColumn() +
-                ": expected " + type +
-                " but found " + this.peek().getType()
-            );
+          throw new RuntimeException(
+            "Error at line " + this.peek().getLine() +
+            ", column " + this.peek().getColumn() +
+            ": expected " + type +
+            " but found " + this.peek().getType()
+          );
         }
     }
 
@@ -111,43 +111,43 @@ public class Parser {
      * C &Rightarrow; id:E;C | skip;C | if (B) { C } else { C } | if (B) { C } else { C } C |  While (B) { cmd } |  While (B) { cmd } C | &lambda;
      */
     private void commands() {
-        if(this.peek().getType() == Token.Type.ID){
-            this.consume(Token.Type.ID);
-            this.consume(Token.Type.ASSIGN);
-            this.arithmeticsExp();
-            this.consume(Token.Type.SEMICOLON);
-        } else if (this.peek().getType() == Token.Type.SKIP){
-            this.consume(Token.Type.SKIP);
-            this.consume(Token.Type.SEMICOLON);
-        } else if (this.peek().getType() == Token.Type.IF) {
-            this.consume(Token.Type.IF);
-            this.consume(Token.Type.LEFTP);
-            this.booleanExp();
-            this.consume(Token.Type.RIGHTP);
-            this.consume(Token.Type.THEN);
-            this.consume(Token.Type.LEFTK);
-            this.commands();
-            this.consume(Token.Type.RIGHTK);
-            this.consume(Token.Type.ELSE);
-            this.consume(Token.Type.LEFTK);
-            this.commands();
-            this.consume(Token.Type.RIGHTK);
-        } else if (this.peek().getType() == Token.Type.WHILE) {
-            this.consume(Token.Type.WHILE);
-            this.consume(Token.Type.LEFTP);
-            this.booleanExp();
-            this.consume(Token.Type.RIGHTP);
-            this.consume(Token.Type.LEFTK);
-            this.commands();
-            this.consume(Token.Type.RIGHTK);
-        } else {
-            throw new RuntimeException("Commands cannot start with the tokien: " + this.peek().toString());
-        }
-        // Trata as sequências de comandos
-        Token.Type next = this.peek().getType();
-        if (next == Token.Type.ID || next == Token.Type.SKIP || next == Token.Type.IF || next == Token.Type.WHILE) {
-            this.commands();
-        }
+      if(this.peek().getType() == Token.Type.ID){
+        this.consume(Token.Type.ID);
+        this.consume(Token.Type.ASSIGN);
+        this.arithmeticsExp();
+        this.consume(Token.Type.SEMICOLON);
+      } else if (this.peek().getType() == Token.Type.SKIP){
+        this.consume(Token.Type.SKIP);
+        this.consume(Token.Type.SEMICOLON);
+      } else if (this.peek().getType() == Token.Type.IF) {
+        this.consume(Token.Type.IF);
+        this.consume(Token.Type.LEFTP);
+        this.booleanExp();
+        this.consume(Token.Type.RIGHTP);
+        this.consume(Token.Type.THEN);
+        this.consume(Token.Type.LEFTK);
+        this.commands();
+        this.consume(Token.Type.RIGHTK);
+        this.consume(Token.Type.ELSE);
+        this.consume(Token.Type.LEFTK);
+        this.commands();
+        this.consume(Token.Type.RIGHTK);
+      } else if (this.peek().getType() == Token.Type.WHILE) {
+        this.consume(Token.Type.WHILE);
+        this.consume(Token.Type.LEFTP);
+        this.booleanExp();
+        this.consume(Token.Type.RIGHTP);
+        this.consume(Token.Type.LEFTK);
+        this.commands();
+        this.consume(Token.Type.RIGHTK);
+      } else {
+        throw new RuntimeException("Commands cannot start with the tokien: " + this.peek().toString());
+      }
+      // Trata as sequências de comandos
+      Token.Type next = this.peek().getType();
+      if (next == Token.Type.ID || next == Token.Type.SKIP || next == Token.Type.IF || next == Token.Type.WHILE) {
+        this.commands();
+      }
     }
 
 
@@ -157,8 +157,8 @@ public class Parser {
      * E &Rightarrow; TE'
      */
     private void arithmeticsExp() {
-        this.term();
-        this.expLine();
+      this.term();
+      this.expLine();
     }
 
     /**
@@ -166,15 +166,15 @@ public class Parser {
      * E' &Rightarrow; +TE' | &lambda;
      */
     private void expLine() {
-        if(this.peek().getType() == Token.Type.PLUS) {
-            this.consume(Token.Type.PLUS);
-            this.term();
-            this.expLine();
-        } else if (this.peek().getType() == Token.Type.MINUS) {
-            this.consume(Token.Type.MINUS);
-            this.term();
-            this.expLine();
-        }
+      if(this.peek().getType() == Token.Type.PLUS) {
+        this.consume(Token.Type.PLUS);
+        this.term();
+        this.expLine();
+      } else if (this.peek().getType() == Token.Type.MINUS) {
+        this.consume(Token.Type.MINUS);
+        this.term();
+        this.expLine();
+      }
     }
 
     /**
@@ -182,8 +182,8 @@ public class Parser {
      * T &Rightarrow; GT'
      */
     private void term() {
-        this.factor();
-        this.termLine();
+      this.factor();
+      this.termLine();
     }
 
     /**
@@ -191,11 +191,11 @@ public class Parser {
      * T' &Rightarrow; *GT' | &lambda;
      */
     private void termLine() {
-        if(this.peek().getType() == Token.Type.PRODUCT) {
-            this.consume(Token.Type.PRODUCT);
-            this.factor();
-            this.termLine();
-        }
+      if(this.peek().getType() == Token.Type.PRODUCT) {
+          this.consume(Token.Type.PRODUCT);
+          this.factor();
+          this.termLine();
+      }
     }
 
     /** 
@@ -208,17 +208,23 @@ public class Parser {
      * @throws RuntimeException Lançada quando o fator não é válido!
      * */
     private void factor() {
-        if(this.peek().getType() == Token.Type.ID) {
-            this.consume(Token.Type.ID);
-        } else if(this.peek().getType() == Token.Type.NUMBER) {
-            this.consume(Token.Type.NUMBER);
-        } else if (this.peek().getType() == Token.Type.LEFTP) {
-            this.consume(Token.Type.LEFTP);
-            this.arithmeticsExp();
-             this.consume(Token.Type.RIGHTP);
-        } else {
-            throw new RuntimeException("Error in line: " + this.peek().getLine() + " column: " + this.peek().getColumn() + "caused by " + this.peek().getLexeme() + " cannot used an arithmetic expression");
-        }
+      if(this.peek().getType() == Token.Type.ID) {
+        this.consume(Token.Type.ID);
+      } else if(this.peek().getType() == Token.Type.NUMBER) {
+        this.consume(Token.Type.NUMBER);
+      } else if (this.peek().getType() == Token.Type.LEFTP) {
+        this.consume(Token.Type.LEFTP);
+        this.arithmeticsExp();
+         this.consume(Token.Type.RIGHTP);
+      } else {
+        throw new RuntimeException(
+          "Error in line: " + 
+          this.peek().getLine() + 
+          " column: " + this.peek().getColumn() + 
+          "caused by " + this.peek().getLexeme() + 
+          " cannot used an arithmetic expression"
+        );
+      }
     }
 
     /**
@@ -227,8 +233,8 @@ public class Parser {
      * B &Rightarrow; T'B'
      */
     private void booleanExp(){
-        this.termBoolean();
-        this.termOrBoolean();
+      this.termBoolean();
+      this.termOrBoolean();
     }
 
     /**
@@ -236,8 +242,8 @@ public class Parser {
      * T' &Rightarrow; F'C | &lambda;
      */
     private void termBoolean(){
-        this.booleanFactor();
-        this.termAndBoolean();
+      this.booleanFactor();
+      this.termAndBoolean();
     }
 
     /**
@@ -245,11 +251,11 @@ public class Parser {
      * C' &Rightarrow; and F'C' | &lambda;
      */
     private void termAndBoolean(){
-        if(this.peek().getType() == Token.Type.AND){
-            this.consume(Token.Type.AND);
-            this.booleanFactor();
-            this.termAndBoolean();
-        }
+      if(this.peek().getType() == Token.Type.AND){
+        this.consume(Token.Type.AND);
+        this.booleanFactor();
+        this.termAndBoolean();
+      }
     }
 
     /**
@@ -258,11 +264,11 @@ public class Parser {
      * B' &Rightarrow; or T'B'
      */
     private void termOrBoolean(){
-        if(this.peek().getType() == Token.Type.OR){
-            this.consume(Token.Type.OR);
-            this.termBoolean();
-            this.termOrBoolean();
-        }
+      if(this.peek().getType() == Token.Type.OR){
+        this.consume(Token.Type.OR);
+        this.termBoolean();
+        this.termOrBoolean();
+      }
     }
 
     /** 
@@ -275,28 +281,27 @@ public class Parser {
      * @throws RuntimeException Lançada quando o fator booleano não é válido!
      * */
     private void booleanFactor(){
-        if(this.peek().getType() == Token.Type.NOT){
-            this.consume(Token.Type.NOT);
-            this.booleanFactor();
-        } else if (this.peek().getType() == Token.Type.LEFTP){
-            this.consume(Token.Type.LEFTP);
-            this.booleanExp();
-            this.consume(Token.Type.RIGHTP);
+      if(this.peek().getType() == Token.Type.NOT){
+        this.consume(Token.Type.NOT);
+        this.booleanFactor();
+      } else if (this.peek().getType() == Token.Type.LEFTP){
+        this.consume(Token.Type.LEFTP);
+        this.booleanExp();
+        this.consume(Token.Type.RIGHTP);
+      } else {
+        if (this.peek().getType() == Token.Type.TRUE){
+          this.consume(Token.Type.TRUE);
+        } else if (this.peek().getType() == Token.Type.FALSE) {
+          this.consume(Token.Type.FALSE);
+        } else if (this.peek().getType() == Token.Type.ID){
+          this.consume(Token.Type.ID);
+        } else if (this.peek().getType() == Token.Type.NUMBER){
+          this.consume(Token.Type.NUMBER);
         } else {
-            if (this.peek().getType() == Token.Type.TRUE){
-                this.consume(Token.Type.TRUE);
-            } else if (this.peek().getType() == Token.Type.FALSE) {
-                this.consume(Token.Type.FALSE);
-            } else if (this.peek().getType() == Token.Type.ID){
-                this.consume(Token.Type.ID);
-            } else if (this.peek().getType() == Token.Type.NUMBER){
-                this.consume(Token.Type.NUMBER);
-            } else {
-                throw new RuntimeException("Unexpected token in boolean expression: " + peek().getType());
-            }
-            this.relations();
+          throw new RuntimeException("Unexpected token in boolean expression: " + peek().getType());
         }
-         
+        this.relations();
+      }
     }
 
     /**
@@ -306,11 +311,11 @@ public class Parser {
      */
     private void relations() {
         if (this.peek().getType() == Token.Type.LESS) {
-            this.consume(Token.Type.LESS);
-            this.relationFactor();
+          this.consume(Token.Type.LESS);
+          this.relationFactor();
         } else if (this.peek().getType() == Token.Type.EQUAL) {
-            this.consume(Token.Type.EQUAL);
-            this.relationFactor();
+          this.consume(Token.Type.EQUAL);
+          this.relationFactor();
         }
     }
 
@@ -324,14 +329,14 @@ public class Parser {
     private void relationFactor(){
         Token.Type type = this.peek().getType();
         if (type == Token.Type.ID || type == Token.Type.NUMBER || 
-            type == Token.Type.TRUE || type == Token.Type.FALSE) {
-            this.consume(type);
+          type == Token.Type.TRUE || type == Token.Type.FALSE) {
+          this.consume(type);
         } else {
-            throw new RuntimeException(
-                "Error on line " + this.peek().getLine() +
-                ", column " + this.peek().getColumn() +
-                ": invalid lexeme " + this.peek().getLexeme()
-            );
+          throw new RuntimeException(
+            "Error on line " + this.peek().getLine() +
+            ", column " + this.peek().getColumn() +
+            ": invalid lexeme " + this.peek().getLexeme()
+          );
         }
     }
 
@@ -347,12 +352,19 @@ public class Parser {
      * @return A AST construída
      */
     public Cmd parseAST() {
-        Cmd program = this.astCommands();
-        if (this.peek().getType() != Token.Type.EOF) {
-            Token t = this.peek();
-            throw new RuntimeException( "Error at line " + t.getLine() + ", column " + t.getColumn() + ": unexpected token " + t.getLexeme());
-        }
-        return program;
+      Cmd program = this.astCommands();
+      if (this.peek().getType() != Token.Type.EOF) {
+        Token t = this.peek();
+        throw new RuntimeException( 
+          "Error at line " + 
+          t.getLine() + 
+          ", column " + 
+          t.getColumn() + 
+          ": unexpected token " + 
+          t.getLexeme()
+        );
+      }
+      return program;
     }
 
     /**

@@ -39,22 +39,20 @@ import site.valdigleis.whicom.analyzers.Token;
  */
 public class Run {
     public static void main( String[] args ) throws IOException, IllegalArgumentException {
-        
-        if(args.length < 1) {
-            throw new IllegalArgumentException("Whicom needs to receive the path to a file with the .w extension.");
-        }
-        
-        String filePath = args[0];
-        if (!filePath.endsWith(".w")) {
-            throw new IllegalArgumentException("Invalid file extension. Expected the extesion .w");
-        }
+      if(args.length < 1) {
+        throw new IllegalArgumentException("Whicom needs to receive the path to a file with the .w extension.");
+      }
+      
+      String filePath = args[0];
+      if (!filePath.endsWith(".w")) {
+        throw new IllegalArgumentException("Invalid file extension. Expected the extesion .w");
+      }
 
-        byte[] bytes = Files.readAllBytes(Paths.get(filePath));
-        String code = new String(bytes);
-        Lexer lexer = new Lexer(code);
-        List<Token> tokens = lexer.tokenize();
-        Parser parser = new Parser(tokens);
-        
-        System.out.println("Hello, world!");
+      byte[] bytes = Files.readAllBytes(Paths.get(filePath));
+      String code = new String(bytes);
+      Lexer lexer = new Lexer(code);
+      List<Token> tokens = lexer.tokenize();
+      Parser parser = new Parser(tokens);
+      
     }
 }
