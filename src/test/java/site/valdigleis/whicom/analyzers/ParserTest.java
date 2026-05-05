@@ -160,7 +160,7 @@ public class ParserTest {
 
     @Test
     public void printProgram() {
-        ArrayList<Token> tokens = new Lexer("x: 0; /* Um comentário aqui\n // olá aqui */y : 49; z: x; while (x < y) { z: z + 1; x: var * z;} if (!(true) or (!(false) and x = y)) then {skip;} else {skip;}").tokenize();
+        ArrayList<Token> tokens = new Lexer("x: 0; /* Um comentário aqui\n // olá aqui */y :\n 49;       z: x; while (x < y) { z: z + 1; x: var * z;} if (!(true) or (!(false) and x = y)) then {skip;} else {skip;}").tokenize();
         for (Token token : tokens) {
             System.out.println(token);
         }

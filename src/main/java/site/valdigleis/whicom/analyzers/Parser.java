@@ -163,7 +163,7 @@ public class Parser {
 
     /**
      * Método que realiza a análise dos sutermos aditivos (E') aninhados a uma expressão aritmética, ou seja, este método é a tradução direta das regras gramaticais:<br> 
-     * E' &Rightarrow; +TE' | &lambda;
+     * E' &Rightarrow; +TE' | -TE' | &lambda;
      */
     private void expLine() {
       if(this.peek().getType() == Token.Type.PLUS) {
