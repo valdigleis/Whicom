@@ -48,7 +48,16 @@ public class Parser {
         }
     }
 
-    // --------------------------------------
+    // ----------------------------------------------------------------------------
+    // Abaixo estão os métodos que efetuam o parse, porém, não constroem a AST
+    // ----------------------------------------------------------------------------
+    
+
+    /**
+     * Método que realiza a análise sintática.
+     * 
+     * @throws RuntimeException no caso de ainda existirem arquivos após o token de EOF
+     */
     public void parse() {
         this.S();
         if (this.peek().type() != TokenType.EOF) {
@@ -56,11 +65,17 @@ public class Parser {
         }
     }
 
+    /**
+     * Método que implementa a produção do símbolo S, ou seja, implementa a produção S &rightarrow; CS'.
+     */
     public void S() {
         this.C();
         this.S_line();
     }
 
+    /**
+     * Método que implementa as produções do símbolo S', ou seja, implementa a produção S' &rightarrow; CS' &mid; &lambda;.
+     */
     private void S_line() {
         // S' -> C S' | lambda
         if (this.peek().type() == TokenType.ID || this.peek().type() == TokenType.IF || this.peek().type() == TokenType.WHILE || this.peek().type() == TokenType.SKIP) {
@@ -69,6 +84,9 @@ public class Parser {
         }
     }
 
+    /**
+     * Método que implementa as produções do símbolo C, ou seja, implementa as produções:<br> C &rightarrow; I := K; &mid; if( B ) then { S } else { S } &mid; while ( B ) { S } &mid; skip;.
+     */
     private void C() {
         if (this.peek().type() == TokenType.ID) {
             String tableRef = this.peek().lexeme();
