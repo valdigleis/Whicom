@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import site.valdigleis.whicom.frontend.utils.Symbol;
-import site.valdigleis.whicom.frontend.utils.SymbolKind;
 import site.valdigleis.whicom.frontend.utils.Token;
 import site.valdigleis.whicom.frontend.utils.TokenType;
 
@@ -32,7 +30,6 @@ public class Lexer {
         KEYWORDS.put("not",   TokenType.NOT);
     }
 
-    private final Map<String, Symbol> symbolTable = new HashMap<>();
 
     private int start = 0;
     private int current = 0;
@@ -114,10 +111,6 @@ public class Lexer {
         }
         String text = this.source.substring(start, current);
         TokenType type = KEYWORDS.getOrDefault(text, TokenType.ID);
-        if (type == TokenType.ID) {
-            Symbol s = new Symbol(text, SymbolKind.VARIABLE, null, null);
-            this.symbolTable.putIfAbsent(text, s);
-        }
         this.addToken(type);
     }
 
@@ -143,9 +136,6 @@ public class Lexer {
         return true;
     }
 
-    public Map<String, Symbol> getSymbolTable() { 
-        return this.symbolTable; 
-    }
 
     private void multiLineComment() {
         while (!isAtEnd()) {
@@ -160,7 +150,6 @@ public class Lexer {
             }
             this.advance();
         }
-        System.err.printf("Error [Line:%d]: multi-line comment not closed.", line);
     }
 
     private char peekNext() {
