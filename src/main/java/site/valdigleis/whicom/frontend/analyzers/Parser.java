@@ -392,7 +392,6 @@ public class Parser {
             this.consume(TokenType.LPAREN);
             Expression condition = this.B_to_AST();
             this.consume(TokenType.RPAREN);
-            this.consume(TokenType.DO);
             this.consume(TokenType.LBRACE);
             BlockStmt body = new BlockStmt(this.S_to_AST());
             this.consume(TokenType.RBRACE);
